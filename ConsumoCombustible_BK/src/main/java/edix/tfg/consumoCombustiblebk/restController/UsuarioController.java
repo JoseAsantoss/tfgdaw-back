@@ -52,7 +52,7 @@ public class UsuarioController {
 	 * @param newUsuario de tipo Usuario
 	 * @return 
 	 */
-	@PostMapping("/nuevo_usuario")
+	@PostMapping("/usuario/nuevo_usuario")
 	public ResponseEntity<?> altaUsuario(@RequestBody Usuario newUsuario) {
 		
 		Usuario user = new Usuario();
@@ -77,10 +77,11 @@ public class UsuarioController {
 	 * @param idUsuario de tipo Long
 	 * @return Usuario Modificado
 	 */
-	@PutMapping("/modifica_usuario/{idUsuario}")
+	@PutMapping("/usuario/modifica-usuario/{idUsuario}")
 	public ResponseEntity<?> modificaUsuario(@RequestBody Usuario newUsuario, @PathVariable Long idUsuario) {
 		
 		Usuario usuActual = iUsuarioService.showUsuarioById(idUsuario);
+	
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
 		if (usuActual != null) {
@@ -97,7 +98,7 @@ public class UsuarioController {
 				resp.put("mensaje", "Usuario modificado con éxito");
 				resp.put("usuario", usuActual);
 			}catch(DataAccessException dae) {
-				resp.put("mensaje", "Error al modificar en la base de datos");
+				resp.put("message", "Error al modificar en la base de datos");
 				resp.put("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
 				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.NOT_MODIFIED);
 			}
@@ -116,7 +117,7 @@ public class UsuarioController {
 	 * @param idUsuario de tipo Long
 	 * @return Usuario Modificado
 	 */
-	@DeleteMapping("/elimina_usuario/{idUsuario}")
+	@DeleteMapping("/usuario/elimina_usuario/{idUsuario}")
 	public ResponseEntity<?> eliminaUsuario(@PathVariable Long idUsuario) {
 		
 		Map<String, Object> resp = new HashMap<String, Object>();

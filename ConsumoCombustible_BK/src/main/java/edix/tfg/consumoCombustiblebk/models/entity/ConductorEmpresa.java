@@ -2,6 +2,7 @@ package edix.tfg.consumoCombustiblebk.models.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 
 import lombok.Data;
 
@@ -19,34 +19,34 @@ import lombok.Data;
  * @author Luis Cifuentes
  * @author Jose A. Santos
  * @version 1.0
- * @since 25/10/2022
+ * @since 03/11/2022
  *
  */
 @Data
 @Entity
-@Table(name="usuarios")
-public class Usuario implements Serializable{
-
+@Table(name="conductor_empresa")
+public class ConductorEmpresa implements Serializable {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long usuarioId;
+	private Long conductorId;
 	
-	private String usuarioEmail;
-	
-	private String usuarioNombre;
-	
-	private String usuarioApellido1;
-	
-	private String usuarioApellido2;
-	
-	private String usuarioPassword;
-	
-	//uni-directional many-to-one association to TiposUsuario
+	//bi-directional many-to-one association to Usuario
 	@ManyToOne
-	@JoinColumn(name="TIPO_USUARIO_ID")
-	private TipoUsuario tipoUsuario;
+	@JoinColumn(name="USUARIO_ID")
+	private Usuario usuario;
 	
+	@Column(unique = true)
+	private String conductorAlias;
 	
-	private static final long serialVersionUID = 1L;	
+	private String conductorNombre;
 	
+	private String conductorApellido1;
+	
+	private String conductorApellido2;
+	
+	private String conductorPassword;
+	
+	private static final long serialVersionUID = 1L;
+
 }

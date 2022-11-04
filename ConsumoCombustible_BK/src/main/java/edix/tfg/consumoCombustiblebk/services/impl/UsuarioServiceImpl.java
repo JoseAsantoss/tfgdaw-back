@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edix.tfg.consumoCombustiblebk.dao.IUsuarioDao;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
@@ -27,6 +28,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	 * Metodo para mostrar todos los usuarios de la aplicacion
 	 * @return List con los usuarios
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public List<Usuario> showUsuarios() {
 		return (List<Usuario>)iUsuarioDao.findAll();
@@ -37,6 +39,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	 * @param idUsuario de tipo Long
 	 * @return Usuario buscado
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public Usuario showUsuarioById(Long idUsuario) {
 		return (Usuario)iUsuarioDao.findById(idUsuario).orElse(null);

@@ -11,28 +11,20 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
-/**
- * Clase Entity que se corresponde con la entidad de base de datos
- * 
- * @author Luis Cifuentes
- * @author Jose A. Santos
- * @version 1.0
- * @since 25/10/2022
- *
- */
 @Data
 @Entity
-@Table(name="tipos_usuario")
-public class TipoUsuario implements Serializable{
-
+@Table(name="combustibles")
+public class Combustible implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="TIPO_USUARIO_ID")
-	private Long tipoUsuarioId;
+	private Long combustibleId;
 	
-	@Column(name="TIPO_USUARIO_NOMBRE")
-	private String tipoUsuarioNombre;
+	private String combustibleNombre;
+	
+	@Column(name="COMBUSTIBLE_UE")
+	private String combustibleUE;
 	
 	private static final long serialVersionUID = 1L;
+
 }
