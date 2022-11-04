@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -68,11 +66,12 @@ public class ConductorEmpresaController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
+			response.put("error", "Por favor inténtelo pasados unos minutos");
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if (!lista.isEmpty()) {
-			log.info("mensaje", "Lista populada");
+			log.info("Lista populada");
 			response.put("lista", lista);
 		}else {
 			log.info("La lista está vacia");
@@ -98,10 +97,11 @@ public class ConductorEmpresaController {
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
 		if(conductor != null) {
-			log.info("mensaje", "El usuario se puede mostrar");
+			log.info("El usuario se puede mostrar");
 			resp.put("conductor", conductor);
 		}else {
-			log.warn("mensaje", "El usuario no se puede mostrar");
+			log.warn("El usuario no se puede mostrar");
+			resp.put("error", "Usuario no encontrado");
 		}
 		
 		log.info("Se envia la respuesta con el status correcto");
@@ -123,14 +123,17 @@ public class ConductorEmpresaController {
 			log.info("Se popula la lista con los datos de la bbdd en base al usuarioId que se ha pasado");
 			lista = iConductorEmpService.mostrarConductorByUsuario(usuarioId);
 			if(lista.isEmpty()) {
-				log.warn("mensaje", "Lista vacia, el usuario buscado no tiene conductores");
+				log.warn("Lista vacia, el usuario buscado no tiene conductores");
+				resp.put("mensaje", "No se han encontrado registros");
+				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.NOT_FOUND);
 			}else {
-				log.info("mensaje", "Lista populada con éxito");
+				log.info("Lista populada con éxito");
 			}
 			
 			resp.put("lista", lista);
 		}catch (NullPointerException npe) {
 			log.error("error", "error: ".concat(npe.getMessage().concat(npe.getLocalizedMessage())));
+			resp.put("error", "Se ha producido un error. Inténtelo más tarde");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -158,12 +161,12 @@ public class ConductorEmpresaController {
 		try {
 			log.info("Se da de alta al nuevo conductor");
 			iConductorEmpService.nuevoConductorEmpresa(conductor);
-			log.info("mensaje", "Alta satisfactoria");
+			log.info("Alta satisfactoria");
 			log.info("Cargamos la respuesta a devolver con el objeto conductor");
 			resp.put("conductor", conductor);
 			
 		}catch (NullPointerException npe) {
-			log.error("error", "error: ".concat(npe.getMessage().concat(npe.getLocalizedMessage())));
+			log.error("error: ".concat(npe.getMessage().concat(npe.getLocalizedMessage())));
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se envia la respuesta con el estatus");
@@ -196,17 +199,19 @@ public class ConductorEmpresaController {
 			log.info("Se actualiza password");
 			conductorActual.setConductorPassword(conductor.getConductorPassword());
 		} else {
-			log.error("mensaje", "El usuario no existe en la base de datos");
+			log.error("El usuario no existe en la base de datos");
+			resp.put("error", "Usuario encontrado en la base de datos");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.NOT_FOUND);
 		}
 		
 		try {
 			log.info("Se actualiza Actualiza el conductor en la base de datos");
 			iConductorEmpService.nuevoConductorEmpresa(conductorActual);
-			log.info("mensaje", "Usuario Modificado con éxito");
+			log.info("Usuario Modificado con éxito");
 			resp.put("conductor", conductorActual);
 		}catch (NullPointerException npe) {
-			log.error("error", "error: ".concat(npe.getMessage().concat(npe.getLocalizedMessage())));
+			log.error("error: ".concat(npe.getMessage().concat(npe.getLocalizedMessage())));
+			resp.put("error", "Se ha producido un error. Inténtelo en unos minutos");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se envia la respuesta con el estatus");
@@ -221,23 +226,25 @@ public class ConductorEmpresaController {
 	@DeleteMapping("/usuario/conductor/elimina-conductor/{conductorId}")
 	public ResponseEntity<?> eliminaConductor(@PathVariable Long conductorId) {
 		log.info("Se va a eliminar al usuario id: " + conductorId);
+		Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Se elimina al conductor de la base de datos");
 			iConductorEmpService.eliminaConductorEmpresa(conductorId);
-			log.info("mensaje", "Conductor eliminado con éxito");
+			log.info("Conductor eliminado con éxito");
+			resp.put("mensaje", "Usuario eliminado satisfactoriamente");
 			
 			return new ResponseEntity<>(HttpStatus.OK);
 		}catch(DataAccessException dae) {
-			Map<String, Object> resp = new HashMap<String, Object>();
 			log.warn("Se busca al conductor en la base de datos");
 			ConductorEmpresa ce = iConductorEmpService.verConductorEmpresa(conductorId);
 			if (ce == null) {
-				log.error("mensaje", "El conductor no figura en la base de datos");
+				log.error("El conductor no figura en la base de datos");
 			}else {
-				log.error("mensaje", "Error al eliminar de la base de datos");
+				log.error("Error al eliminar de la base de datos");
 			}
 			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			resp.put("mensaje", "Se haproducido un error al eliminar");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	}

@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
+import lombok.extern.log4j.Log4j2;
 
 @RestController
 @RequestMapping("/api")
+@Log4j2
 public class UsuarioController {
 
 	@Autowired
@@ -32,8 +34,25 @@ public class UsuarioController {
 	 * @return List<Usuario> con los usuarios.
 	 */
 	@GetMapping({"/usuarios", "/usuarios/"})
-	public List<Usuario> listaUsuarios() {
-		return iUsuarioService.showUsuarios();
+	public ResponseEntity<?> listaUsuarios() {
+		
+		log.info("Petición de lista de usuarios");
+		
+		Map<String, Object> resp = new HashMap<String, Object>();
+		
+		log.info("Se obtiene la lista de ususarios de la base de datos");
+		List<Usuario> lista = iUsuarioService.showUsuarios();
+		
+		if (lista.isEmpty() || lista.size() == 0) {
+			log.info("No se ha obtenido datos de la base de datos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}else {
+			log.info("Lista populada correctamente.");
+			resp.put("lista", lista);
+			log.info("Se envia response y estatus");
+			return new ResponseEntity<>(resp, HttpStatus.OK);
+		}
+
 	}
 	
 	
@@ -43,8 +62,23 @@ public class UsuarioController {
 	 * @return Usuario buscado
 	 */
 	@GetMapping("/usuario/{usuarioId}")
-	public Usuario UsuarioPorId(@PathVariable Long usuarioId) {
-		return iUsuarioService.showUsuarioById(usuarioId);
+	public ResponseEntity<?> UsuarioPorId(@PathVariable Long usuarioId) {
+		log.info("Petición de usuarios por su Id");
+		Map<String, Object> resp = new HashMap<String, Object>();
+		Usuario usuario = null;
+		
+		try {
+			log.info("Se recupera el usuario de la base de datos");
+			usuario = iUsuarioService.showUsuarioById(usuarioId);
+			resp.put("usuario", usuario);
+		}catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se envia response y estatus");
+		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
 	}
 	
 	/**
@@ -54,20 +88,23 @@ public class UsuarioController {
 	 */
 	@PostMapping("/usuario/nuevo_usuario")
 	public ResponseEntity<?> altaUsuario(@RequestBody Usuario newUsuario) {
+		log.info("Se da de alta un nuevo usuario");
 		
 		Usuario user = new Usuario();
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
 		try {
+			log.info("Se manda a base de datos el nuevo usuario");
 			user = iUsuarioService.createUsuario(newUsuario);
-			resp.put("mensaje", "Usuario creado con éxito");
+			log.info("Usuario creado con éxito");
+			resp.put("mensaje", "Usuario dado de alta con éxito");
 			resp.put("usuario", user);
 		}catch(DataAccessException dae) {
-			resp.put("mensaje", "Error al realizar el insert en la base de datos");
-			resp.put("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			log.error("Error al realizar el insert en la base de datos");
+			log.error(dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
+		log.info("Se envia response y estatus");
 		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.CREATED);
 	}
 	
@@ -79,27 +116,34 @@ public class UsuarioController {
 	 */
 	@PutMapping("/usuario/modifica-usuario/{idUsuario}")
 	public ResponseEntity<?> modificaUsuario(@RequestBody Usuario newUsuario, @PathVariable Long idUsuario) {
+		log.info("Se quiere modificar un usuario");
 		
+		log.info("Se recupera el usuario de la base de datos");
 		Usuario usuActual = iUsuarioService.showUsuarioById(idUsuario);
 	
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
 		if (usuActual != null) {
-			usuActual.setUsuarioId(newUsuario.getUsuarioId());
+			log.info("Se actualiza el nombre");
 			usuActual.setUsuarioNombre(newUsuario.getUsuarioNombre());
+			log.info("Se actualiza apellido1");
 			usuActual.setUsuarioApellido1(newUsuario.getUsuarioApellido1());
+			log.info("Se actualiza apellido2");
 			usuActual.setUsuarioApellido2(newUsuario.getUsuarioApellido2());
+			log.info("Se actualiza Email");
 			usuActual.setUsuarioEmail(newUsuario.getUsuarioEmail());
+			log.info("Se actualiza password");
 			usuActual.setUsuarioPassword(newUsuario.getUsuarioPassword());
-			usuActual.setTipoUsuario(newUsuario.getTipoUsuario());
 			
 			try {
+				log.info("Se actualiza el usuario en la base de datos");
 				iUsuarioService.updateUsuario(usuActual);
-				resp.put("mensaje", "Usuario modificado con éxito");
+				log.info("Usuario modificado con éxito");
+				resp.put("mensaje","Usuario actualizado correctamente");
 				resp.put("usuario", usuActual);
 			}catch(DataAccessException dae) {
-				resp.put("message", "Error al modificar en la base de datos");
-				resp.put("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+				log.error("message", "Error al modificar en la base de datos");
+				log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
 				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.NOT_MODIFIED);
 			}
 			
@@ -119,16 +163,19 @@ public class UsuarioController {
 	 */
 	@DeleteMapping("/usuario/elimina_usuario/{idUsuario}")
 	public ResponseEntity<?> eliminaUsuario(@PathVariable Long idUsuario) {
-		
+		log.info("Se elimina a un usuario");
 		Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
+			log.info("Se manda eliminar el usuario en la base de datos");
 			iUsuarioService.deleteUsuario(idUsuario);
+			log.info("Usuario eliminado de la base de datos");
 			resp.put("mensaje", "Usuario eliminado con éxito");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
 		}catch(DataAccessException dae) {
-			resp.put("mensaje", "Error al eliminar de la base de datos");
-			resp.put("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			log.error("mensaje", "Error al eliminar de la base de datos");
+			log.error(dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			resp.put("mensaje", "Se ha producido un error. Inténtelo en unos minutos");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	}

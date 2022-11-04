@@ -1,33 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="warn" monitorInterval="30">
-	<Properties>
-		<Property name="baseDir">logs</Property>
-	</Properties>
-	<Appenders>
-		<Console name="Console" targe="SYSTEM_OUT">
-			<PatterLayout pattern="%-30d %p [%t] %-30.30C: %msg%throwable" />
-		</Console>
-		
-		<RollingFile name="File" fileName="${baseDir}/app-log4j2.log"
-					filePattern="${baseDir}/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}.log.gz">
-			<PatternLayout pattern="%d %p %c{1.} [%t] %m%n%" />
-			<CronTriggerinPolicy schedule="0 0 0 * * ?" />
-			<DefaulRolloverStrategy>
-				<Delete basePath="${baseDir}" maxDepth="2">
-					<IfFileName glob="*/app-*.log.gz" />
-					<IfLasModified age="60d" />
-				</Delete>
-			</DefaulRolloverStrategy>
-		</RollingFile>
-	</Appenders>
-	<Loggers>
-		<Root level="info">
-			<AppenderRef ref="Console" />
-			<AppenderRef ref="File" />
-		</Root>
-		<Root level="debug">
-			<AppenderRef ref="Console" />
-			<AppenderRef ref="File" />
-		</Root>
-	</Loggers>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%-30d %p [%t] %-30.30C: %msg%n%throwable" />
+        </Console>
+
+        <RollingFile name="File" fileName="./logs/app-log4j2.log" filePattern="./logs/app-%d{-dd-MMMM-yyyy}-%i.log4j2.log.gz">
+            <PatternLayout>
+                <pattern>%d %p [%t] %C: %msg%n%throwable</pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Root>
+
+        <Logger name="edix.tfg.consumoCombustiblebk" level="DEBUG"/>
+    </Loggers>
+
 </Configuration>
