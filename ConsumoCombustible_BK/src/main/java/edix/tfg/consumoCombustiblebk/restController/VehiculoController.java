@@ -174,12 +174,41 @@ public class VehiculoController {
 	/**
 	 * Ver un repostaje concreto de un vehículo
 	 */
-	@GetMapping("/vehiculo/{vehiculoId}/repostaje/{repostajeId}")
+	/*@GetMapping("/vehiculo/{vehiculoId}/repostaje/{repostajeId}")
 	public ResponseEntity<?> RepostajeDetalle(@PathVariable Long vehiculoId, @PathVariable Long repostajeId) {
 		Map<String, Object> resp = new HashMap<String, Object>();
 		Repostaje repostaje = new Repostaje();
 	
 		try {
+			System.out.println("Entra en RepostajeDetalle");
+			repostaje = iRepostajeService.showRepostaje(repostajeId);
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			resp.put("error", "Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		if(repostaje != null) {
+			log.info("El repostaje se puede mostrar");
+			resp.put("repostaje", repostaje);
+		}else {
+			log.warn("El repostaje no se puede mostrar");
+			resp.put("error", "Repostaje no encontrado");
+		}
+		
+		log.info("Se devuelve el objeto response más el estado del HttpStatus");
+		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+	}*/
+	
+	@GetMapping("/vehiculo/repostaje/{repostajeId}")
+	public ResponseEntity<?> RepostajeDetalle(@PathVariable Long repostajeId) {
+		Map<String, Object> resp = new HashMap<String, Object>();
+		Repostaje repostaje = new Repostaje();
+	
+		try {
+			System.out.println("Entra en RepostajeDetalle");
 			repostaje = iRepostajeService.showRepostaje(repostajeId);
 		} catch (NullPointerException npe) {
 			log.error(npe.getStackTrace());

@@ -13,11 +13,11 @@ import edix.tfg.consumoCombustiblebk.models.entity.Repostaje;
 import edix.tfg.consumoCombustiblebk.services.IRepostajeService;
 
 /**
- * Clase que implementea los metodos de la interfaz IConductorService
+ * Clase que implementea los metodos de la interfaz IRepostajeService
  * @author Luis Cifuentes
  * @author Jose A. Santos
  * @version 1.0
- * @since 03/11/2022
+ * @since 05/11/2022
  *
  */
 @Service
@@ -36,7 +36,6 @@ public class RepostajeServiceImpl implements IRepostajeService{
 	@Override
 	public List<Repostaje> showByVehiculoId(Long idVehiculo) {
 		return iRepostajeDao.repostajesByIdVehiculo(idVehiculo);
-		//return iRepostajeDao.findAll();
 	}
 
 	/**
@@ -66,9 +65,10 @@ public class RepostajeServiceImpl implements IRepostajeService{
 	@Transactional(readOnly = true)
 	@Override
 	public Repostaje showRepostaje(Long repostajeId) {
-		Repostaje repostaje = new Repostaje();
+		//Repostaje repostaje = new Repostaje();
 		//return repostaje;
-		return iRepostajeDao.findById((long) 1).orElse(repostaje);
+		System.out.println("Entra en showRepostaje");
+		return iRepostajeDao.findById(repostajeId).orElse(null);
 	}
 
 	/**
