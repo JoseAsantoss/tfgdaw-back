@@ -1,9 +1,12 @@
 package edix.tfg.consumoCombustiblebk.services.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edix.tfg.consumoCombustiblebk.dao.IVehiculoDao;
+import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.services.IVehiculoService;
 
@@ -24,6 +27,16 @@ public class VehiculoServiceImpl implements IVehiculoService {
 	@Override
 	public Vehiculo altaVehiculoUsuario(Vehiculo vehiculo) {
 		return iVehiculoDao.save(vehiculo);
+	}
+
+	@Override
+	public List<Vehiculo> listaVehiculosUsuario(Long usuarioId) {
+		return iVehiculoDao.findVehiculosByUsuario(usuarioId);		
+	}
+
+	@Override
+	public Vehiculo detallesVehiculo(Long vehiculoId) {
+		return iVehiculoDao.findById(vehiculoId).orElse(null);
 	}
 	
 }
