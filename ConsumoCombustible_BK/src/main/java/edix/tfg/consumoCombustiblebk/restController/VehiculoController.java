@@ -10,9 +10,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -187,44 +189,23 @@ public class VehiculoController {
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addRepostaje(
 			@PathVariable Long vehiculoId,
-			@RequestBody String repostajeJson) {
-
-		System.out.println("El repostaje recogido es " + repostajeJson);
+			@RequestBody Repostaje repostajeJson) {
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
-		ObjectMapper mapper = new ObjectMapper();
-		
-		//Repostaje repostaje = new Repostaje();
 		try {
-			Repostaje repostaje = mapper.readValue(repostajeJson, Repostaje.class);
-			System.out.println("El repostaje jsoneado es " + repostaje.toString());
-
-			System.out.println("El vehiculoId recogido es " + vehiculoId.toString());
-			System.out.println("El repostaje recogido es " + repostajeJson);
-			try {
-				iRepostajeService.addRepostaje(repostaje);
-				
-			} catch (DataAccessException dae) {
-				log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-				resp.put("error","Error al añadir repostaje. Revise los datos e inténtelo más tarde");
-				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			iRepostajeService.addRepostaje(repostajeJson);
+			
+		} catch (DataAccessException dae) {
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			resp.put("error","Error al añadir repostaje. Revise los datos e inténtelo más tarde");
+			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		/*if(vehiculoId != repostaje.getVehiculo().getVehiculoId()) {
-			log.info("No coinciden el vehículo indicado con el repostaje propuesto");
-		}*/
-		
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
 		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
 	}
+	
 	/**
 	 * Ver un repostaje concreto de un vehículo
 	 */
@@ -257,5 +238,103 @@ public class VehiculoController {
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
 		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+	}
+	
+
+	
+	/**
+	 * Borrar un repostaje concreto por su ID
+	 */
+	@DeleteMapping("/vehiculo/{vehiculoId}/repostaje/{repostajeId}/borrar-repostaje")
+	public ResponseEntity<?> eliminaRepostaje(@PathVariable Long repostajeId) {
+		
+		log.info("Eliminar el repostaje con id: " + repostajeId);
+		
+		Vehiculo vehiculo = iRepostajeService.showRepostaje(repostajeId).getVehiculo();
+
+		log.info("El vehículo del repostaje  " + repostajeId + 
+				" es el de matrícula " + vehiculo.getVehiculoMatricula());
+		
+		
+		Map<String, Object> resp = new HashMap<String, Object>();
+	
+		try {
+			log.info("Borrar el repostaje de la BBDD");
+			iRepostajeService.delRepostaje(repostajeId);
+			
+			log.info("Repostaje eliminado con éxito");
+			resp.put("mensaje", "Repostaje eliminado satisfactoriamente");
+			
+			return new ResponseEntity<>(HttpStatus.OK);
+			
+		} catch(DataAccessException dae) {
+			log.warn("Se busca repostaje en la base de datos");
+			Repostaje rep = iRepostajeService.showRepostaje(repostajeId);
+			
+			if (rep == null) {
+				log.error("El repostaje no existe en la base de datos");
+			}else {
+				log.error("Error al eliminar de la base de datos");
+			}
+			
+			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			resp.put("mensaje", "Se ha producido un error al eliminar");
+			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		}	
+	
+	}
+	
+
+	
+
+	
+	/**
+	 * Modificar un repostaje concreto por su ID
+	 */
+	@PutMapping("/vehiculo/{vehiculoId}/repostaje/{repostajeId}/editar-repostaje")
+	public ResponseEntity<?> modificarRepostaje(
+			@PathVariable Long repostajeId,
+			@RequestBody Repostaje repostajeJson) {
+		
+		log.info("Modificar el repostaje con id: " + repostajeId);
+		
+		Vehiculo vehiculo = iRepostajeService.showRepostaje(repostajeId).getVehiculo();
+
+		log.info("El vehículo del repostaje " + repostajeId + 
+				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcasCoche().getMarcaNombre() + 
+				" modelo " + vehiculo.getVersionCoche().getModelosCoche().getModeloNombre() + 
+				" versión " + vehiculo.getVersionCoche().getVersionNombre() + 
+				" con matrícula " + vehiculo.getVehiculoMatricula());
+		
+		repostajeJson.setRepostajeId(repostajeId);
+		
+		Map<String, Object> resp = new HashMap<String, Object>();
+	
+		try {
+			log.info("Modificar el repostaje de la BBDD");
+			iRepostajeService.editRepostaje(repostajeJson);
+			
+			log.info("Repostaje modificado con éxito");
+			resp.put("mensaje", "Repostaje modificado satisfactoriamente");
+			
+			return new ResponseEntity<>(HttpStatus.OK);
+			
+		} catch(DataAccessException dae) {		
+			
+			log.warn("Se busca repostaje en la base de datos");
+			Repostaje rep = iRepostajeService.showRepostaje(repostajeId);
+			
+			if (rep == null) {
+				log.error("El repostaje no existe en la base de datos");
+			} else {
+				log.error("Error al eliminar de la base de datos");
+			}
+			
+			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			resp.put("mensaje", "Se ha producido un error al eliminar");
+			
+			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		}	
+	
 	}
 }
