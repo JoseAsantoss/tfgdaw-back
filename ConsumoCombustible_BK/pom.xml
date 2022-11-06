@@ -14,7 +14,11 @@
 	<name>ConsumoCombustible_BK</name>
 	<description>ConsumoCombustible_BK</description>
 	<properties>
+	
 		<java.version>11</java.version>
+		
+		<!-- Use the latest version whenever possible. -->
+  		<jackson.version>2.13.2</jackson.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -63,6 +67,19 @@
 		    <artifactId>spring-boot-starter-log4j2</artifactId>
 		    <version>2.7.5</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-webmvc</artifactId>
+		    <version>5.3.23</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+
+        <dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>${jackson.version}</version>
+	  	</dependency>
 
 
 		

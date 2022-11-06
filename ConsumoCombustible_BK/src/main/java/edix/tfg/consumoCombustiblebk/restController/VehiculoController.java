@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Repostaje;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
@@ -83,7 +88,8 @@ public class VehiculoController {
 	 * Lista de vehículos del usuario
 	 */
 	@GetMapping("/usuario/{usuarioId}/vehiculos")
-	public ResponseEntity<?> VehiculosUsuario(@PathVariable Long usuarioId) {
+	public ResponseEntity<?> VehiculosUsuario(
+			@PathVariable Long usuarioId) {
 
 		Map<String, Object> resp = new HashMap<String, Object>();
 		List<Vehiculo> listaVehiculos = new ArrayList<Vehiculo>();
@@ -113,7 +119,8 @@ public class VehiculoController {
 	 * Detalles de un vehículo
 	 */
 	@GetMapping("/vehiculo/{vehiculoId}")
-	public ResponseEntity<?> VehiculoDetalle(@PathVariable Long vehiculoId) {
+	public ResponseEntity<?> VehiculoDetalle(
+			@PathVariable Long vehiculoId) {
 
 		Map<String, Object> resp = new HashMap<String, Object>();
 		Vehiculo vehiculo = new Vehiculo();
@@ -144,7 +151,8 @@ public class VehiculoController {
 	 * Ver repostajes de un vehículo
 	 */
 	@GetMapping("/vehiculo/{vehiculoId}/repostajes")
-	public ResponseEntity<?> RepostajesVehiculo(@PathVariable Long vehiculoId) {
+	public ResponseEntity<?> RepostajesVehiculo(
+			@PathVariable Long vehiculoId) {
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		List<Repostaje> listaRepostajes = new ArrayList<Repostaje>();
@@ -172,38 +180,59 @@ public class VehiculoController {
 	}
 	
 	/**
-	 * Ver un repostaje concreto de un vehículo
+	 * Añadir un repostaje a un vehículo
 	 */
-	/*@GetMapping("/vehiculo/{vehiculoId}/repostaje/{repostajeId}")
-	public ResponseEntity<?> RepostajeDetalle(@PathVariable Long vehiculoId, @PathVariable Long repostajeId) {
-		Map<String, Object> resp = new HashMap<String, Object>();
-		Repostaje repostaje = new Repostaje();
-	
-		try {
-			System.out.println("Entra en RepostajeDetalle");
-			repostaje = iRepostajeService.showRepostaje(repostajeId);
-		} catch (NullPointerException npe) {
-			log.error(npe.getStackTrace());
-			log.error(npe.getCause());
-			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	@PostMapping(
+			path = "/vehiculo/{vehiculoId}/nuevo-repostaje", 
+	        consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> addRepostaje(
+			@PathVariable Long vehiculoId,
+			@RequestBody String repostajeJson) {
+
+		System.out.println("El repostaje recogido es " + repostajeJson);
 		
-		if(repostaje != null) {
-			log.info("El repostaje se puede mostrar");
-			resp.put("repostaje", repostaje);
-		}else {
-			log.warn("El repostaje no se puede mostrar");
-			resp.put("error", "Repostaje no encontrado");
+		Map<String, Object> resp = new HashMap<String, Object>();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		//Repostaje repostaje = new Repostaje();
+		try {
+			Repostaje repostaje = mapper.readValue(repostajeJson, Repostaje.class);
+			System.out.println("El repostaje jsoneado es " + repostaje.toString());
+
+			System.out.println("El vehiculoId recogido es " + vehiculoId.toString());
+			System.out.println("El repostaje recogido es " + repostajeJson);
+			try {
+				iRepostajeService.addRepostaje(repostaje);
+				
+			} catch (DataAccessException dae) {
+				log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+				resp.put("error","Error al añadir repostaje. Revise los datos e inténtelo más tarde");
+				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		/*if(vehiculoId != repostaje.getVehiculo().getVehiculoId()) {
+			log.info("No coinciden el vehículo indicado con el repostaje propuesto");
+		}*/
+		
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
 		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
-	}*/
-	
-	@GetMapping("/vehiculo/repostaje/{repostajeId}")
-	public ResponseEntity<?> RepostajeDetalle(@PathVariable Long repostajeId) {
+	}
+	/**
+	 * Ver un repostaje concreto de un vehículo
+	 */
+	@GetMapping("/vehiculo/{vehiculoId}/repostaje/{repostajeId}")
+	public ResponseEntity<?> RepostajeDetalle(
+			@PathVariable Long vehiculoId, 
+			@PathVariable Long repostajeId) {
+		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		Repostaje repostaje = new Repostaje();
 	

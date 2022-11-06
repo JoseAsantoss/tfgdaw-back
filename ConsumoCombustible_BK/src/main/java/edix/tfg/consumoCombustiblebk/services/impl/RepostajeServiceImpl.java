@@ -65,9 +65,6 @@ public class RepostajeServiceImpl implements IRepostajeService{
 	@Transactional(readOnly = true)
 	@Override
 	public Repostaje showRepostaje(Long repostajeId) {
-		//Repostaje repostaje = new Repostaje();
-		//return repostaje;
-		System.out.println("Entra en showRepostaje");
 		return iRepostajeDao.findById(repostajeId).orElse(null);
 	}
 
