@@ -2,6 +2,9 @@ package edix.tfg.consumoCombustiblebk.services.impl;
 
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,37 @@ public class MantenimientoServiceImpl implements IMantenimientoService{
 	@Override
 	public List<Mantenimiento> showByVehiculoId(Long idVehiculo) {
 		return iMantenimientoDao.mantenimientosByIdVehiculo(idVehiculo);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<Mantenimiento> showByVehiculoIdAndDate(Long vehiculoId, Date fechaInicio, Date fechaFin) {
+
+		SimpleDateFormat fechaSDF = new SimpleDateFormat("yyyy-MM-dd");
+		
+		if (fechaInicio == null && fechaFin == null) {
+			return iMantenimientoDao.mantenimientosByIdVehiculo(vehiculoId);
+		}
+		
+		if (fechaInicio != null && fechaFin == null) {
+			try {
+				fechaFin = fechaSDF.parse("2200-12-31");
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
+		
+		if (fechaInicio == null && fechaFin != null) {
+			try {
+				fechaInicio = fechaSDF.parse("1900-01-01");
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+		}
+		
+		return iMantenimientoDao.mantenimientosPorVehiculoIdFechas(vehiculoId, fechaInicio, fechaFin);
 	}
 
 	/**
