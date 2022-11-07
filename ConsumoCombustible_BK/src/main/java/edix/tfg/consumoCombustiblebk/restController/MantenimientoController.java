@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Mantenimiento;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
@@ -51,11 +52,90 @@ public class MantenimientoController {
 	
 	/**
 	 * Ver Mantenimientos de un vehículo.
+	 * 
 	 * Opcionalmente se indican las fechas entre las que están 
 	 * comprendidos los Mantenimientos como parámetros en la cabecera.
+	 * 
+	 * Alternativa y opcionalmente permite filtrar con búsqueda de los mantenimientos
+	 * 
+	 * https://stackoverflow.com/a/60889337
 	 */
 	@GetMapping("/{vehiculoId}/mantenimientos")
 	public ResponseEntity<?> MantenimientosVehiculo(
+			@PathVariable Long vehiculoId,
+			@RequestParam Map<String, String> params) 
+					 throws ParseException{
+		
+		Map<String, Object> resp = new HashMap<String, Object>();
+		List<Mantenimiento> listaMantenimientos = new ArrayList<Mantenimiento>();		
+		SimpleDateFormat fechaSDF = new SimpleDateFormat("yyyy-MM-dd");
+				
+		Date fechaInicioDate = null;
+		Date fechaFinDate = null;
+		
+		if (params.size() == 0) { //sin parámetros
+			try {
+				listaMantenimientos = iMantenimientoService.showByVehiculoId(vehiculoId);
+			} catch (NullPointerException npe) {
+				log.error(npe.getStackTrace());
+				log.error(npe.getCause());
+				log.error(npe.initCause(npe));
+				resp.put("error", "Por favor inténtelo pasados unos minutos");
+				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		if (params.size() > 2) { //Aceptar solo dos parámetros
+		      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sólo se pueden incluir dos parámetros");
+		}
+		
+		String fechaInicio = "1900-01-01";
+		String fechaFin = "2200-12-31";
+		
+		if (params.containsKey("fechaInicio")) {
+			fechaInicio = params.get("fechaInicio");
+		}
+		
+		if (params.containsKey("fechaFin")) {
+			fechaFin = params.get("fechaFin");
+		}
+		
+		try {
+			fechaInicioDate = fechaSDF.parse(fechaInicio);
+			fechaFinDate = fechaSDF.parse(fechaFin);			
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			resp.put("error", "Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		if (params.containsKey("buscar")) {
+			String busqueda = params.get("buscar");
+			listaMantenimientos = iMantenimientoService.searchByVehiculoId(vehiculoId, busqueda);
+		} else if  (params.containsKey("buscar-profundo")) {
+			String busqueda = params.get("buscar-profundo");
+			listaMantenimientos = iMantenimientoService.searchConceptObsByVehiculoId(vehiculoId, busqueda);
+		} else {
+			listaMantenimientos = iMantenimientoService.showByVehiculoIdAndDate(vehiculoId, fechaInicioDate, fechaFinDate);
+		}
+		
+		
+		if(!listaMantenimientos.isEmpty()) {
+			log.info("Lista populada");
+			resp.put("listaMantenimientos", listaMantenimientos);
+		} else {
+			log.info("La lista está vacia");
+			resp.put("mensaje", "Lista vacia");
+		}
+		
+		log.info("Se devuelve el objeto response más el estado del HttpStatus");
+		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+	}
+	
+	
+	/*public ResponseEntity<?> MantenimientosVehiculo(
 			@PathVariable Long vehiculoId,
 			@RequestParam(required = false) String fechaInicio,
 			@RequestParam(required = false) String fechaFin) 
@@ -96,7 +176,7 @@ public class MantenimientoController {
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
 		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
-	}
+	}*/
 	
 	
 	/**

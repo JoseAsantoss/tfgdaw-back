@@ -22,4 +22,14 @@ public interface IMantenimientoDao extends JpaRepository<Mantenimiento, Long> {
 			+ "AND mto.mantenimientoFecha <= ?3")
 	public List<Mantenimiento> mantenimientosPorVehiculoIdFechas(Long vehiculoId, Date fechaInicio, Date fechaFin);
 
+	@Query("select mto from Mantenimiento mto "
+			+ "where mto.vehiculo.vehiculoId = ?1 "
+			+ "AND mto.mantenimientoDetalle LIKE %?2%")
+	public List<Mantenimiento> searchByVehiculoId(Long idVehiculo, String search);
+	
+	@Query("select mto from Mantenimiento mto "
+			+ "where mto.vehiculo.vehiculoId = ?1 "
+			+ "AND (mto.mantenimientoObservaciones LIKE %?2% "
+			+ "OR mto.mantenimientoDetalle LIKE %?2%)")
+	public List<Mantenimiento> searchDeepByVehiculoId(Long idVehiculo, String search);
 }
