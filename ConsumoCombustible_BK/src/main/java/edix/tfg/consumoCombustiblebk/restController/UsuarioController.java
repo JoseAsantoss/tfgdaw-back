@@ -1,8 +1,12 @@
 package edix.tfg.consumoCombustiblebk.restController;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -15,7 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
@@ -31,24 +37,70 @@ public class UsuarioController {
 	
 	/**
 	 * End point para listar todos los usuarios de la aplicacion
+	 * 
+	 * Mediante parámetros en la cabecera se pueden realizar filtrado 
+	 * de los usuarios, con parámetro de búsqueda, y 
+	 * además parámetros varios para elegir buscar por cada uno de 
+	 * los atributos del usuario (nombre, apellido1, apellido2, email)
+	 * 
 	 * @return List<Usuario> con los usuarios.
 	 */
 	@GetMapping({"/usuarios", "/usuarios/"})
-	public ResponseEntity<?> listaUsuarios() {
+	public ResponseEntity<?> listaUsuarios(
+			@RequestParam Map<String, String> params) 
+					 throws ParseException {
 		
 		log.info("Petición de lista de usuarios");
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
-		log.info("Se obtiene la lista de ususarios de la base de datos");
-		List<Usuario> lista = iUsuarioService.showUsuarios();
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>();		
+		Set<Usuario> listaCombinada = new LinkedHashSet<Usuario>();
 		
-		if (lista.isEmpty() || lista.size() == 0) {
+		if (params.size() == 0) {
+			try {
+				log.info("Se obtiene la lista de usuarios de la base de datos");
+				listaUsuarios = iUsuarioService.showUsuarios();
+			} catch (NullPointerException npe) {
+				log.error(npe.getStackTrace());
+				log.error(npe.getCause());
+				log.error(npe.initCause(npe));
+				resp.put("error", "Por favor inténtelo pasados unos minutos");
+				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		if (params.size() > 5) { //Aceptar máx 5 parámetros
+		      throw new ResponseStatusException(
+		    		  HttpStatus.BAD_REQUEST, 
+		    		  "Sólo se pueden incluir 5 parámetros máximo");
+		}		
+		
+		if (params.containsKey("buscar")) {
+			String busqueda = params.get("buscar");
+			
+			if (params.containsKey("email")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioEmail(busqueda));
+			}			
+			if (params.containsKey("nombre")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioNombre(busqueda));
+			}			
+			if (params.containsKey("apellido1")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioApellido1(busqueda));
+			}			
+			if (params.containsKey("apellido2")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioApellido2(busqueda));
+			}
+			
+			listaUsuarios = new ArrayList<Usuario>(listaCombinada);		
+		}
+		
+		if (listaUsuarios.isEmpty() || listaUsuarios.size() == 0) {
 			log.info("No se ha obtenido datos de la base de datos");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}else {
+		} else {
 			log.info("Lista populada correctamente.");
-			resp.put("lista", lista);
+			resp.put("lista", listaUsuarios);
 			log.info("Se envia response y estatus");
 			return new ResponseEntity<>(resp, HttpStatus.OK);
 		}

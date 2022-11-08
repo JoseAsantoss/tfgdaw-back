@@ -1,6 +1,9 @@
 package edix.tfg.consumoCombustiblebk.services.impl;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,75 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	@Override
 	public Usuario showUsuarioById(Long idUsuario) {
 		return (Usuario)iUsuarioDao.findById(idUsuario).orElse(null);
+	}
+
+	/**
+	 * Metodo para buscar usuarios
+	 * @param textoBusqueda de tipo String
+	 * @param 4xBoolean para indicar si busca en email, 
+	 * nombre, o en cada uno de los apellidos.
+	 * @return Usuario buscado
+	 */
+	
+	//https://www.digitalocean.com/community/tutorials/set-to-list-in-java
+	/*@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchUsuario(
+			String textoBusqueda,
+			Boolean email, 
+			Boolean nombre,
+			Boolean apellido1,
+			Boolean apellido2) {
+		
+		Set<Usuario> listaCombinada = new LinkedHashSet<Usuario>();
+		
+		if (email) {
+			listaCombinada.addAll(iUsuarioDao.busquedaUsuarioEmail(textoBusqueda));
+		}
+		
+		if (nombre) {
+			listaCombinada.addAll(iUsuarioDao.busquedaUsuarioNombre(textoBusqueda));
+		}
+		
+		if (apellido1) {
+			listaCombinada.addAll(iUsuarioDao.busquedaUsuarioApellido1(textoBusqueda));
+		}
+		
+		if (apellido2) {
+			listaCombinada.addAll(iUsuarioDao.busquedaUsuarioApellido2(textoBusqueda));
+		}
+		
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>(listaCombinada);
+		
+		return listaUsuarios;
+	}*/
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchUsuarioEmail(
+			String textoBusqueda) {
+		return iUsuarioDao.busquedaUsuarioEmail(textoBusqueda);
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchUsuarioNombre(
+			String textoBusqueda) {
+		return iUsuarioDao.busquedaUsuarioNombre(textoBusqueda);
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchUsuarioApellido1(
+			String textoBusqueda) {
+		return iUsuarioDao.busquedaUsuarioApellido1(textoBusqueda);
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchUsuarioApellido2(
+			String textoBusqueda) {
+		return iUsuarioDao.busquedaUsuarioApellido2(textoBusqueda);
 	}
 
 	/**
