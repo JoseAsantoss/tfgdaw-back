@@ -78,8 +78,18 @@ public class MantenimientoServiceImpl implements IMantenimientoService{
 	}
 
 	@Override
+	public List<Mantenimiento> searchByVehiculoIdFechas(Long idVehiculo, String search, Date fechaInicio, Date fechaFin) {
+		return iMantenimientoDao.searchByVehiculoIdDate(idVehiculo, search, fechaInicio, fechaFin);
+	}
+
+	@Override
 	public List<Mantenimiento> searchConceptObsByVehiculoId(Long idVehiculo, String search) {
 		return iMantenimientoDao.searchDeepByVehiculoId(idVehiculo, search);
+	}
+
+	@Override
+	public List<Mantenimiento> searchConceptObsByVehiculoIdFechas(Long idVehiculo, String search, Date fechaInicio, Date fechaFin) {
+		return iMantenimientoDao.searchDeepByVehiculoIdDate(idVehiculo, search, fechaInicio, fechaFin);
 	}
 
 	/**

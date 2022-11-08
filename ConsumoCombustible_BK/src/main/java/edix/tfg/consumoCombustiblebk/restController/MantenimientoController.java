@@ -85,8 +85,8 @@ public class MantenimientoController {
 			}
 		}
 		
-		if (params.size() > 2) { //Aceptar solo dos parámetros
-		      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sólo se pueden incluir dos parámetros");
+		if (params.size() > 3) { //Aceptar solo dos parámetros (dos fechas y cadena de búsqueda)
+		      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sólo se pueden incluir tres parámetros");
 		}
 		
 		String fechaInicio = "1900-01-01";
@@ -113,10 +113,10 @@ public class MantenimientoController {
 		
 		if (params.containsKey("buscar")) {
 			String busqueda = params.get("buscar");
-			listaMantenimientos = iMantenimientoService.searchByVehiculoId(vehiculoId, busqueda);
+			listaMantenimientos = iMantenimientoService.searchByVehiculoIdFechas(vehiculoId, busqueda, fechaInicioDate, fechaFinDate);
 		} else if  (params.containsKey("buscar-profundo")) {
 			String busqueda = params.get("buscar-profundo");
-			listaMantenimientos = iMantenimientoService.searchConceptObsByVehiculoId(vehiculoId, busqueda);
+			listaMantenimientos = iMantenimientoService.searchConceptObsByVehiculoIdFechas(vehiculoId, busqueda, fechaInicioDate, fechaFinDate);
 		} else {
 			listaMantenimientos = iMantenimientoService.showByVehiculoIdAndDate(vehiculoId, fechaInicioDate, fechaFinDate);
 		}
