@@ -19,5 +19,12 @@ public interface IVehiculoDao extends JpaRepository<Vehiculo, Long> {
 			+ "WHERE vh.usuario.usuarioId = ?1 "
 			+ "AND vh.vehiculoMatricula LIKE %?2%")
 	public List<Vehiculo> busquedaVehiculosUsuario(Long usuarioId, String busqueda);
+	
+	@Query("SELECT vh from Vehiculo vh "
+			+ "WHERE vh.usuario.usuarioId = ?1 "
+			+ "AND (vh.versionCoche.versionNombre LIKE %?2% "
+			+ "OR vh.versionCoche.modelosCoche.modeloNombre LIKE %?2% "
+			+ "OR vh.versionCoche.modelosCoche.marcasCoche.marcaNombre LIKE %?2% )")
+	public List<Vehiculo> busquedaVehiculosUsuarioDescripcion(Long usuarioId, String busqueda);
 
 }

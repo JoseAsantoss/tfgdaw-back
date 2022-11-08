@@ -29,8 +29,13 @@ public class VehiculoServiceImpl implements IVehiculoService {
 	}
 
 	@Override
-	public List<Vehiculo> busquedaVehiculosUsuario(Long usuarioId, String busqueda) {
-		return iVehiculoDao.busquedaVehiculosUsuario(usuarioId, busqueda);
+	public List<Vehiculo> busquedaVehiculosUsuarioMatricula(Long usuarioId, String buscarMatricula) {
+		return iVehiculoDao.busquedaVehiculosUsuario(usuarioId, buscarMatricula);
+	}
+
+	@Override
+	public List<Vehiculo> busquedaVehiculosUsuario(Long usuarioId, String marcaModeloVersion) {
+		return iVehiculoDao.busquedaVehiculosUsuarioDescripcion(usuarioId, marcaModeloVersion);
 	}
 
 	@Override

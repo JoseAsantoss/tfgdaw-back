@@ -46,7 +46,9 @@ public class VehiculoController {
 	IRepostajeService iRepostajeService;
 	
 	@PostMapping("/usuario/nuevo-vehiculo")
-	public ResponseEntity<?> altaVehiculoDeUsuario(@RequestBody Vehiculo vehiculo) {
+	public ResponseEntity<?> altaVehiculoDeUsuario(
+			@RequestBody Vehiculo vehiculo) {
+		
 		log.info("Usuario " + vehiculo.getUsuario().getUsuarioId() + "da de alta un nuevo vehiculo");
 		Map<String, Object> resp = new HashMap<String, Object>();
 		log.info("Se recogen los datos del usuario");
@@ -83,37 +85,6 @@ public class VehiculoController {
 	
 	/**
 	 * Lista de vehículos del usuario
-	 */
-	/*@GetMapping("/usuario/{usuarioId}/vehiculos")
-	public ResponseEntity<?> vehiculosUsuario(
-			@PathVariable Long usuarioId) {
-
-		Map<String, Object> resp = new HashMap<String, Object>();
-		List<Vehiculo> listaVehiculos = new ArrayList<Vehiculo>();
-		
-		try {
-			listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
-		} catch (NullPointerException npe) {
-			log.error(npe.getStackTrace());
-			log.error(npe.getCause());
-			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		if (!listaVehiculos.isEmpty()) {
-			log.info("Lista populada");
-			resp.put("lista", listaVehiculos);
-		}else {
-			log.info("La lista está vacia");
-			resp.put("mensaje", "Lista vacia");
-		}
-
-		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
-	}*/
-	
-	/**
-	 * Lista de vehículos del usuario
 	 * 
 	 * Búsqueda por matrícula de vehículos del usuario si envía parámetro
 	 */
@@ -147,7 +118,20 @@ public class VehiculoController {
 		if (params.containsKey("matricula")) {
 			String matricula = params.get("matricula");
 			try {
-				listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, matricula);
+				listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
+			} catch (NullPointerException npe) {
+				log.error(npe.getStackTrace());
+				log.error(npe.getCause());
+				log.error(npe.initCause(npe));
+				resp.put("error", "Por favor inténtelo pasados unos minutos");
+				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		if (params.containsKey("descripcion")) {
+			String descripcion = params.get("descripcion");
+			try {
+				listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, descripcion);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -160,7 +144,7 @@ public class VehiculoController {
 		if (!listaVehiculos.isEmpty()) {
 			log.info("Lista populada");
 			resp.put("lista", listaVehiculos);
-		}else {
+		} else {
 			log.info("La lista está vacia");
 			resp.put("mensaje", "Lista vacia");
 		}
