@@ -56,7 +56,8 @@ public class MantenimientoController {
 	 * Opcionalmente se indican las fechas entre las que están 
 	 * comprendidos los Mantenimientos como parámetros en la cabecera.
 	 * 
-	 * Alternativa y opcionalmente permite filtrar con búsqueda de los mantenimientos
+	 * Alternativa, complementaria y opcionalmente permite filtrar con 
+	 * búsqueda de los mantenimientos.
 	 * 
 	 * https://stackoverflow.com/a/60889337
 	 */

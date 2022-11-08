@@ -86,7 +86,9 @@ public class VehiculoController {
 	/**
 	 * Lista de vehículos del usuario
 	 * 
-	 * Búsqueda por matrícula de vehículos del usuario si envía parámetro
+	 * Búsqueda por matrícula de vehículos del usuario si envía parámetro matricula.
+	 * Búsqueda por marca, modelo o versión si envía parámetro descripcion.
+	 * 
 	 */
 	@GetMapping("/usuario/{usuarioId}/vehiculos")
 	public ResponseEntity<?> busquedaVehiculosUsuario(
