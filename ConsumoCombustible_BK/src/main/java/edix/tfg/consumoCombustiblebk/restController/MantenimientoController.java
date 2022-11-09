@@ -330,7 +330,7 @@ public class MantenimientoController {
 			resp.put("mensaje", "Se ha producido un error al eliminar");
 			
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-		}	
+		}
 	
 	}
 }
