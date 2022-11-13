@@ -1,14 +1,18 @@
 package edix.tfg.consumoCombustiblebk.models.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 import lombok.Data;
@@ -41,10 +45,12 @@ public class Usuario implements Serializable{
 	
 	private String usuarioPassword;
 	
-	//uni-directional many-to-one association to TiposUsuario
-	@ManyToOne
-	@JoinColumn(name="TIPO_USUARIO_ID")
-	private TipoUsuario tipoUsuario;
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="usuarios_tipos", joinColumns= @JoinColumn(name="usuario_id"),
+	inverseJoinColumns=@JoinColumn(name="tipo_usuario_id"),
+	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "tipo_usuario_id"})})
+	private List<TipoUsuario> tiposUsuario;
+	
 	
 	
 	private static final long serialVersionUID = 1L;	
