@@ -95,7 +95,7 @@ public class RepostajeController {
 		}
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<List<Repostaje>>(listaRepostajes, HttpStatus.OK);
 	}
 	
 	
@@ -107,21 +107,21 @@ public class RepostajeController {
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addRepostaje(
 			@PathVariable Long vehiculoId,
-			@RequestBody Repostaje repostajeJson) {
+			@RequestBody Repostaje repostajeNuevo) {
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 		
 		try {
-			iRepostajeService.addRepostaje(repostajeJson);
+			iRepostajeService.addRepostaje(repostajeNuevo);
 			
 		} catch (DataAccessException dae) {
 			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-			resp.put("error","Error al añadir repostaje. Revise los datos e inténtelo más tarde");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("error","Error al añadir repostaje. Revise los datos e inténtelo más tarde");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<Repostaje>(repostajeNuevo, HttpStatus.OK);
 	}
 	
 	
@@ -133,7 +133,7 @@ public class RepostajeController {
 			@PathVariable Long vehiculoId, 
 			@PathVariable Long repostajeId) {
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 		Repostaje repostaje = new Repostaje();
 	
 		try {
@@ -143,20 +143,20 @@ public class RepostajeController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("error", "Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if(repostaje != null) {
 			log.info("El repostaje se puede mostrar");
-			resp.put("repostaje", repostaje);
+			//resp.put("repostaje", repostaje);
 		} else {
 			log.warn("El repostaje no se puede mostrar");
-			resp.put("error", "Repostaje no encontrado");
+			//resp.put("error", "Repostaje no encontrado");
 		}
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<Repostaje>(repostaje, HttpStatus.OK);
 	}
 	
 
@@ -170,22 +170,22 @@ public class RepostajeController {
 		
 		log.info("Eliminar el repostaje con id: " + repostajeId);
 		
-		Vehiculo vehiculo = iRepostajeService.showRepostaje(repostajeId).getVehiculo();
+		Repostaje repostajeBorrar = iRepostajeService.showRepostaje(repostajeId);		
+		Vehiculo vehiculo = repostajeBorrar.getVehiculo();
 
 		log.info("El vehículo del repostaje  " + repostajeId + 
-				" es el de matrícula " + vehiculo.getVehiculoMatricula());
+				" es el de matrícula " + vehiculo.getVehiculoMatricula());		
 		
-		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Borrar el repostaje de la BBDD");
 			iRepostajeService.delRepostaje(repostajeId);
 			
 			log.info("Repostaje eliminado con éxito");
-			resp.put("mensaje", "Repostaje eliminado satisfactoriamente");
+			//resp.put("mensaje", "Repostaje eliminado satisfactoriamente");
 			
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<Repostaje>(repostajeBorrar, HttpStatus.OK);
 			
 		} catch(DataAccessException dae) {
 			log.warn("Se busca repostaje en la base de datos");
@@ -198,8 +198,8 @@ public class RepostajeController {
 			}
 			
 			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			resp.put("mensaje", "Se ha producido un error al eliminar");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("mensaje", "Se ha producido un error al eliminar");
+			return new ResponseEntity<Repostaje>(rep, HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
 	
@@ -212,8 +212,8 @@ public class RepostajeController {
 			@RequestBody Repostaje repostajeJson) {
 		
 		log.info("Modificar el repostaje con id: " + repostajeId);
-		
-		Vehiculo vehiculo = iRepostajeService.showRepostaje(repostajeId).getVehiculo();
+		Repostaje repostajePrevio = iRepostajeService.showRepostaje(repostajeId);
+		Vehiculo vehiculo = repostajePrevio.getVehiculo();
 
 		log.info("El vehículo del repostaje " + repostajeId + 
 				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcasCoche().getMarcaNombre() + 
@@ -223,16 +223,16 @@ public class RepostajeController {
 		
 		repostajeJson.setRepostajeId(repostajeId);
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Modificar el repostaje de la BBDD");
 			iRepostajeService.editRepostaje(repostajeJson);
 			
 			log.info("Repostaje modificado con éxito");
-			resp.put("mensaje", "Repostaje modificado satisfactoriamente");
+			//resp.put("mensaje", "Repostaje modificado satisfactoriamente");
 			
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<Repostaje>(repostajeJson, HttpStatus.OK);
 			
 		} catch(DataAccessException dae) {		
 			
@@ -246,9 +246,9 @@ public class RepostajeController {
 			}
 			
 			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			resp.put("mensaje", "Se ha producido un error al eliminar");
+			//resp.put("mensaje", "Se ha producido un error al eliminar");
 			
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Repostaje>(rep, HttpStatus.INTERNAL_SERVER_ERROR);
 		}	
 	
 	}

@@ -22,17 +22,17 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name="tipos_usuario")
-public class TipoUsuario implements Serializable{
+@Table(name="roles")
+public class Rol implements Serializable{
 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="TIPO_USUARIO_ID")
-	private Long tipoUsuarioId;
+	@Column(name="ROL_ID")
+	private Long rolId;
 	
-	@Column(name="TIPO_USUARIO_NOMBRE")
-	private String tipoUsuarioNombre;
+	@Column(name="ROL_DESCRIPCION")
+	private String rolDescripcion;
 	
 	private static final long serialVersionUID = 1L;
 }

@@ -185,7 +185,7 @@ public class UsuarioController {
 			log.info("Se actualiza Email");
 			usuActual.setUsuarioEmail(newUsuario.getUsuarioEmail());
 			log.info("Se actualiza password");
-			usuActual.setUsuarioPassword(newUsuario.getUsuarioPassword());
+			usuActual.setPassword(newUsuario.getPassword());
 			
 			try {
 				log.info("Se actualiza el usuario en la base de datos");

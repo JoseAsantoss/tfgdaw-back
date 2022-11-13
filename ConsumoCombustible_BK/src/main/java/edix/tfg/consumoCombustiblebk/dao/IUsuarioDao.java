@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 
 /**
  * Interfaz de la capa Dao anotada como Repository que extiende de
@@ -37,5 +38,15 @@ public interface IUsuarioDao extends JpaRepository<Usuario, Long>{
 			+ "WHERE usr.usuarioApellido2 LIKE %?1% ")
 	public List<Usuario> busquedaUsuarioApellido2(String busqueda);
 
+	@Query("SELECT u.vehiculos FROM Usuario u "
+			+ "INNER JOIN u.vehiculos uv "
+			+ "WHERE u.usuarioId = ?1 "
+			+ "AND uv.vehiculoMatricula LIKE %?2% ")
+	public List<Vehiculo> listarVehiculosUsuario(Long usuarioId, String matricula);
+
+	@Query("SELECT u.vehiculos FROM Usuario u "
+			+ "INNER JOIN u.vehiculos uv "
+			+ "WHERE u.usuarioId = ?1 ")
+	public List<Vehiculo> listarVehiculosUsuario(Long usuarioId);
 
 }

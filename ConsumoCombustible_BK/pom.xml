@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.4</version>
+		<version>2.6.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>edix.tfg.consumoCombustiblebk</groupId>
@@ -54,19 +54,18 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-data-jpa</artifactId>
-		    <version>2.7.5</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2 -->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-log4j2</artifactId>
-		    <version>2.7.5</version><!--$NO-MVN-MAN-VER$-->
+		    <version>2.6.3</version>
 		</dependency>
+
 		
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
 		<dependency>
@@ -74,6 +73,23 @@
 		    <artifactId>spring-webmvc</artifactId>
 		    <version>5.3.23</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-taglibs</artifactId>
+		    <version>5.6.2</version>
+		</dependency>
+		
+		<!--dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency-->
+		<!--dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency-->
 
         <dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>

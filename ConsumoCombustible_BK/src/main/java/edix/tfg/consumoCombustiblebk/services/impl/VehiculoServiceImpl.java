@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edix.tfg.consumoCombustiblebk.dao.IUsuarioDao;
 import edix.tfg.consumoCombustiblebk.dao.IVehiculoDao;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.services.IVehiculoService;
@@ -23,6 +24,9 @@ public class VehiculoServiceImpl implements IVehiculoService {
 	@Autowired
 	IVehiculoDao iVehiculoDao;
 	
+	@Autowired
+	IUsuarioDao iUsuarioDao;
+	
 	@Override
 	public Vehiculo altaVehiculoUsuario(Vehiculo vehiculo) {
 		return iVehiculoDao.save(vehiculo);
@@ -30,17 +34,18 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
 	@Override
 	public List<Vehiculo> busquedaVehiculosUsuarioMatricula(Long usuarioId, String buscarMatricula) {
-		return iVehiculoDao.busquedaVehiculosUsuario(usuarioId, buscarMatricula);
+		System.out.println("entra en busquedaVehiculosUsuarioMatricula");
+		return iUsuarioDao.listarVehiculosUsuario(usuarioId, buscarMatricula);
 	}
 
 	@Override
 	public List<Vehiculo> busquedaVehiculosUsuario(Long usuarioId, String marcaModeloVersion) {
-		return iVehiculoDao.busquedaVehiculosUsuarioDescripcion(usuarioId, marcaModeloVersion);
+		return iUsuarioDao.listarVehiculosUsuario(usuarioId);
 	}
 
 	@Override
 	public List<Vehiculo> listaVehiculosUsuario(Long usuarioId) {
-		return iVehiculoDao.findVehiculosByUsuario(usuarioId);		
+		return iUsuarioDao.findById(usuarioId).orElse(null).getVehiculos();
 	}
 
 	@Override

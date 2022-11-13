@@ -67,7 +67,7 @@ public class MantenimientoController {
 			@RequestParam Map<String, String> params) 
 					 throws ParseException{
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 		List<Mantenimiento> listaMantenimientos = new ArrayList<Mantenimiento>();		
 		SimpleDateFormat fechaSDF = new SimpleDateFormat("yyyy-MM-dd");
 				
@@ -81,8 +81,8 @@ public class MantenimientoController {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
 				log.error(npe.initCause(npe));
-				resp.put("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+				//resp.put("error", "Por favor inténtelo pasados unos minutos");
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -108,8 +108,8 @@ public class MantenimientoController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("error", "Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if (params.containsKey("buscar")) {
@@ -125,60 +125,16 @@ public class MantenimientoController {
 		
 		if(!listaMantenimientos.isEmpty()) {
 			log.info("Lista populada");
-			resp.put("listaMantenimientos", listaMantenimientos);
+			//resp.put("listaMantenimientos", listaMantenimientos);
 		} else {
 			log.info("La lista está vacia");
-			resp.put("mensaje", "Lista vacia");
+			//resp.put("mensaje", "Lista vacia");
 		}
 		
-		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		log.info("Se devuelve la lista de Mantenimiento y el estado del HttpStatus");
+		return new ResponseEntity<List<Mantenimiento>>(listaMantenimientos, HttpStatus.OK);
 	}
-	
-	
-	/*public ResponseEntity<?> MantenimientosVehiculo(
-			@PathVariable Long vehiculoId,
-			@RequestParam(required = false) String fechaInicio,
-			@RequestParam(required = false) String fechaFin) 
-					 throws ParseException{
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
-		List<Mantenimiento> listaMantenimientos = new ArrayList<Mantenimiento>();
-		
-		SimpleDateFormat fechaSDF = new SimpleDateFormat("yyyy-MM-dd");
-		
-		Date fechaInicioDate = null;
-		Date fechaFinDate = null;
-		
-		if (fechaInicio != null) {
-			fechaInicioDate = fechaSDF.parse(fechaInicio);
-		} 
-		if (fechaFin != null) {
-			fechaFinDate = fechaSDF.parse(fechaFin);
-		}
-	
-		try {
-			listaMantenimientos = iMantenimientoService.showByVehiculoIdAndDate(vehiculoId, fechaInicioDate, fechaFinDate);
-		} catch (NullPointerException npe) {
-			log.error(npe.getStackTrace());
-			log.error(npe.getCause());
-			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		if(!listaMantenimientos.isEmpty()) {
-			log.info("Lista populada");
-			resp.put("listaMantenimientos", listaMantenimientos);
-		} else {
-			log.info("La lista está vacia");
-			resp.put("mensaje", "Lista vacia");
-		}
-		
-		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
-	}*/
-	
 	
 	/**
 	 * Añadir un Mantenimiento a un vehículo
@@ -190,19 +146,19 @@ public class MantenimientoController {
 			@PathVariable Long vehiculoId,
 			@RequestBody Mantenimiento mantenimientoJson) {
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 		
 		try {
 			iMantenimientoService.addMantenimiento(mantenimientoJson);
 			
 		} catch (DataAccessException dae) {
 			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-			resp.put("error","Error al añadir mantenimiento. Revise los datos e inténtelo más tarde");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("error","Error al añadir mantenimiento. Revise los datos e inténtelo más tarde");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<Mantenimiento>(mantenimientoJson, HttpStatus.OK);
 	}
 	
 	
@@ -214,7 +170,7 @@ public class MantenimientoController {
 			@PathVariable Long vehiculoId, 
 			@PathVariable Long mantenimientoId) {
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 		Mantenimiento mantenimiento = new Mantenimiento();
 	
 		try {
@@ -224,20 +180,20 @@ public class MantenimientoController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("error", "Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if(mantenimiento != null) {
 			log.info("El Mantenimiento se puede mostrar");
-			resp.put("Mantenimiento", mantenimiento);
+			//resp.put("Mantenimiento", mantenimiento);
 		} else {
 			log.warn("El mantenimiento no se puede mostrar");
-			resp.put("error", "Mantenimiento no encontrado");
+			//resp.put("error", "Mantenimiento no encontrado");
 		}
 		
-		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		log.info("Devolver Mantenimiento y estado del HttpStatus");
+		return new ResponseEntity<Mantenimiento>(mantenimiento, HttpStatus.OK);
 	}
 	
 
@@ -251,22 +207,23 @@ public class MantenimientoController {
 		
 		log.info("Eliminar el Mantenimiento con id: " + mantenimientoId);
 		
-		Vehiculo vehiculo = iMantenimientoService.showMantenimiento(mantenimientoId).getVehiculo();
+		Mantenimiento mantenimientoBorrar = iMantenimientoService.showMantenimiento(mantenimientoId);
+		Vehiculo vehiculo = mantenimientoBorrar.getVehiculo();
 
 		log.info("El vehículo del Mantenimiento  " + mantenimientoId + 
 				" es el de matrícula " + vehiculo.getVehiculoMatricula());
 		
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Borrar el Mantenimiento de la BBDD");
 			iMantenimientoService.delMantenimiento(mantenimientoId);
 			
 			log.info("Mantenimiento eliminado con éxito");
-			resp.put("mensaje", "Mantenimiento eliminado satisfactoriamente");
+			//resp.put("mensaje", "Mantenimiento eliminado satisfactoriamente");
 			
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<Mantenimiento>(mantenimientoBorrar, HttpStatus.OK);
 			
 		} catch(DataAccessException dae) {
 			log.warn("Se busca Mantenimiento en la base de datos");
@@ -279,8 +236,8 @@ public class MantenimientoController {
 			}
 			
 			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			resp.put("mensaje", "Se ha producido un error al eliminar");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			//resp.put("mensaje", "Se ha producido un error al eliminar");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
 	
@@ -294,7 +251,8 @@ public class MantenimientoController {
 		
 		log.info("Modificar el Mantenimiento con id: " + mantenimientoId);
 		
-		Vehiculo vehiculo = iMantenimientoService.showMantenimiento(mantenimientoId).getVehiculo();
+		Mantenimiento mantenimientoEditar = iMantenimientoService.showMantenimiento(mantenimientoId);
+		Vehiculo vehiculo = mantenimientoEditar.getVehiculo();
 
 		log.info("El vehículo del Mantenimiento " + mantenimientoId + 
 				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcasCoche().getMarcaNombre() + 
@@ -304,16 +262,16 @@ public class MantenimientoController {
 		
 		mantenimientoJson.setMantenimientoId(mantenimientoId);
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
+		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Modificar el Mantenimiento de la BBDD");
 			iMantenimientoService.editMantenimiento(mantenimientoJson);
 			
 			log.info("Mantenimiento modificado con éxito");
-			resp.put("mensaje", "Mantenimiento modificado satisfactoriamente");
+			//resp.put("mensaje", "Mantenimiento modificado satisfactoriamente");
 			
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<Mantenimiento>(mantenimientoEditar, HttpStatus.OK);
 			
 		} catch(DataAccessException dae) {		
 			
@@ -327,9 +285,9 @@ public class MantenimientoController {
 			}
 			
 			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			resp.put("mensaje", "Se ha producido un error al eliminar");
+			//resp.put("mensaje", "Se ha producido un error al eliminar");
 			
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	
 	}

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edix.tfg.consumoCombustiblebk.dao.IUsuarioDao;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 
 /**
@@ -144,6 +145,12 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	@Override
 	public void deleteUsuario(Long idUsuario) {
 		iUsuarioDao.deleteById(idUsuario);	
+	}
+
+	@Override
+	public List<Vehiculo> searchVehiculosUsuario(Long idUsuario) {
+		Usuario usuario = iUsuarioDao.getById(idUsuario);
+		return usuario.getVehiculos();
 	}
 
 }

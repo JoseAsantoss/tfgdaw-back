@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edix.tfg.consumoCombustiblebk.dao.ITipoUsuarioDao;
-import edix.tfg.consumoCombustiblebk.models.entity.TipoUsuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.services.ITipoUsuarioService;
 
 /**
@@ -33,39 +33,39 @@ public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<TipoUsuario> findAll() {
-		return (List<TipoUsuario>)iTipoUsuarioDao.findAll();
+	public List<Rol> findAll() {
+		return (List<Rol>)iTipoUsuarioDao.findAll();
 	}
 	
 	/**
 	 * Metodo que devuelve un objeto de tipo TipoUsuario de la base de datos
 	 * @param idTipo de tipo Long - id del Tipo de usuario buscado.
-	 * @return {@link TipoUsuario} - Tipo usuario buscado.
+	 * @return {@link Rol} - Tipo usuario buscado.
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public TipoUsuario findById(Long idTipo) {
+	public Rol findById(Long idTipo) {
 		return iTipoUsuarioDao.findById(idTipo).orElse(null);
 	}
 
 	/**
 	 * Metodo que crea un nuevo Tipo de usuarios
-	 * @param tipoUsuario de tipo {@link TipoUsuario}
-	 * @return {@link TipoUsuario} - Tipo usuario creado
+	 * @param tipoUsuario de tipo {@link Rol}
+	 * @return {@link Rol} - Tipo usuario creado
 	 */
 	@Override
-	public TipoUsuario createTipoUsuario(TipoUsuario tipoUsuario) {
+	public Rol createTipoUsuario(Rol tipoUsuario) {
 		return iTipoUsuarioDao.saveAndFlush(tipoUsuario);
 	}
 
 	/**
 	 * Metodo para actualizar un tipo de usuario
-	 * @param tipoUsuario de tipo {@link TipoUsuario}
-	 * @return {@link TipoUsuario} - Tipo usuario actualizado
+	 * @param tipoUsuario de tipo {@link Rol}
+	 * @return {@link Rol} - Tipo usuario actualizado
 	 * 
 	 */
 	@Override
-	public TipoUsuario updateTipoUsuario(TipoUsuario tipoUsuario) {	
+	public Rol updateTipoUsuario(Rol tipoUsuario) {	
 		return iTipoUsuarioDao.saveAndFlush(tipoUsuario);
 	}
 

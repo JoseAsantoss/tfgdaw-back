@@ -45,26 +45,23 @@ public class VehiculoController {
 	@Autowired
 	IRepostajeService iRepostajeService;
 	
-	@PostMapping("/usuario/nuevo-vehiculo")
+	@PostMapping("/usuario/{usuarioId}/nuevo-vehiculo")
 	public ResponseEntity<?> altaVehiculoDeUsuario(
+			@PathVariable Long usuarioId, 
 			@RequestBody Vehiculo vehiculo) {
 		
-		log.info("Usuario " + vehiculo.getUsuario().getUsuarioId() + "da de alta un nuevo vehiculo");
 		Map<String, Object> resp = new HashMap<String, Object>();
 		log.info("Se recogen los datos del usuario");
-		Usuario usuario = iUsuarioService.showUsuarioById(vehiculo.getUsuario().getUsuarioId());
+		Usuario usuario = iUsuarioService.showUsuarioById(usuarioId);
 		log.info("se recogen los datos de las version de coche");
 		VersionCoche version = iVersionCocheService.showByVersionId(vehiculo.getVersionCoche().getVersionId());
-		
-		if (usuario != null) {
-			log.info("Usuario no es null y se asigna a vehiculo");
-			vehiculo.setUsuario(usuario);
-		}
 		
 		if (version != null) {
 			log.info("Version de vehiculo no es null y se asigna a vehiculo");
 			vehiculo.setVersionCoche(version);
 		}
+		
+		
 		
 		try {
 			log.info("Se da de alta el vehiculo en la base de datos");
@@ -72,14 +69,20 @@ public class VehiculoController {
 			resp.put("mensaje", "Alta satisfactoria");
 			resp.put("vehiculo", vehiculo);
 			log.info("Alta del vehiculo correcta");
-				
+			
+			//asignar al usuario
+			if (usuario != null) {
+				log.info("Usuario no es null. Se obtiene su lista de vehículos y se añade el nuevo");
+				usuario.getVehiculos().add(vehiculo);
+				iUsuarioService.updateUsuario(usuario);
+			}
 		}catch (DataAccessException dae) {
 			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
 			resp.put("error","Se ha producido un erro en el alta. Revise los datos e inténtelo más tarde");
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se envia response y estatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.CREATED);
+		return new ResponseEntity<Vehiculo>(vehiculo, HttpStatus.CREATED);
 	}
 	
 	
@@ -152,7 +155,7 @@ public class VehiculoController {
 		}
 
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<List<Vehiculo>>(listaVehiculos, HttpStatus.OK);
 	}
 	
 	/**
@@ -172,7 +175,7 @@ public class VehiculoController {
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
 			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Vehiculo>(vehiculo, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		if(vehiculo != null) {
@@ -184,6 +187,7 @@ public class VehiculoController {
 		}
 
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		//return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<Vehiculo>(vehiculo, HttpStatus.OK);
 	}	
 }

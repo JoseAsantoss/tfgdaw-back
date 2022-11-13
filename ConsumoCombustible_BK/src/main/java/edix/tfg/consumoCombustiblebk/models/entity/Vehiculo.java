@@ -37,11 +37,6 @@ public class Vehiculo implements Serializable {
 	@Column(unique = true)
 	private String vehiculoMatricula;
 	
-	//bi-directional many-to-one association to Usuario
-	@ManyToOne
-	@JoinColumn(name="USUARIO_ID")
-	private Usuario usuario;
-
 	//uni-directional many-to-one association to VersionesCoche
 	@ManyToOne
 	@JoinColumn(name="VERSION_ID")

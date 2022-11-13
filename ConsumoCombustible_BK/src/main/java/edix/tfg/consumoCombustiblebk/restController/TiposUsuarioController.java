@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edix.tfg.consumoCombustiblebk.models.entity.TipoUsuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.services.ITipoUsuarioService;
 
 
@@ -44,7 +44,7 @@ public class TiposUsuarioController {
 	@GetMapping({"", "/"})
 	public ResponseEntity<?> showTipoUsuario() {
 		
-		List<TipoUsuario> lista = tipoUsuarioService.findAll();
+		List<Rol> lista = tipoUsuarioService.findAll();
 		Map<String, Object> response = new HashMap<String, Object>();
 		
 		if(lista.isEmpty() || lista == null) {
@@ -65,8 +65,8 @@ public class TiposUsuarioController {
 	 * @return ResponseEntity<Map<String, Object>> con el response y el status del servidor.
 	 */
 	@PostMapping("/nuevoTipo")
-	public ResponseEntity<?> createTipoUsuario(@RequestBody TipoUsuario tipoUsuario) {
-		TipoUsuario newTipo = new TipoUsuario();
+	public ResponseEntity<?> createTipoUsuario(@RequestBody Rol tipoUsuario) {
+		Rol newTipo = new Rol();
 		Map<String, Object> response = new HashMap<String, Object>();
 		
 		if (tipoUsuario != null) {
@@ -96,9 +96,9 @@ public class TiposUsuarioController {
 	 * @return ResponseEntity<Map<String, Object>> con el response y el status del servidor.
 	 */
 	@PutMapping("/actualizaTipo/{id}")
-	public ResponseEntity<?> updateTipoUsuario(@RequestBody TipoUsuario tipoUsuario, @PathVariable("id") Long idTipoUsuario){
+	public ResponseEntity<?> updateTipoUsuario(@RequestBody Rol tipoUsuario, @PathVariable("id") Long idTipoUsuario){
 		
-		TipoUsuario tipoAux = tipoUsuarioService.findById(idTipoUsuario);
+		Rol tipoAux = tipoUsuarioService.findById(idTipoUsuario);
 		Map<String, Object> response = new HashMap<String, Object>();
 		
 		if(tipoAux != null) {

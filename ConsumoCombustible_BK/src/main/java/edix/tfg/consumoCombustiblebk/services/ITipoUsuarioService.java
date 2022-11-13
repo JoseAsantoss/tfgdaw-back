@@ -2,7 +2,7 @@ package edix.tfg.consumoCombustiblebk.services;
 
 import java.util.List;
 
-import edix.tfg.consumoCombustiblebk.models.entity.TipoUsuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 
 /**
  * Interface de la capa de servicio de la aplicacion
@@ -14,9 +14,9 @@ import edix.tfg.consumoCombustiblebk.models.entity.TipoUsuario;
  */
 public interface ITipoUsuarioService {
 
-	public List<TipoUsuario> findAll();
-	public TipoUsuario findById(Long idTipo);
-	public TipoUsuario createTipoUsuario(TipoUsuario tipoUsuario);
-	public TipoUsuario updateTipoUsuario(TipoUsuario tipoUsuario);
+	public List<Rol> findAll();
+	public Rol findById(Long idTipo);
+	public Rol createTipoUsuario(Rol tipoUsuario);
+	public Rol updateTipoUsuario(Rol tipoUsuario);
 	public void deleteTipoUsuario(Long idTipo);
 }

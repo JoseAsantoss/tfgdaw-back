@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 
 /**
  * Interfaz UsuarioService
@@ -22,6 +23,7 @@ public interface IUsuarioService {
 	public List<Usuario> searchUsuarioNombre(String textoBusqueda);
 	public List<Usuario> searchUsuarioApellido1(String textoBusqueda);
 	public List<Usuario> searchUsuarioApellido2(String textoBusqueda);	
+	public List<Vehiculo> searchVehiculosUsuario(Long idUsuario);	
 	public Usuario createUsuario(Usuario newUsuario);
 	public Usuario updateUsuario(Usuario updateUsuario);
 	public void deleteUsuario(Long idUsuario);

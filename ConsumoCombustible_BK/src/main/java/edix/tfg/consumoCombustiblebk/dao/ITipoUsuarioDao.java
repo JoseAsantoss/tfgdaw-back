@@ -3,7 +3,7 @@ package edix.tfg.consumoCombustiblebk.dao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import edix.tfg.consumoCombustiblebk.models.entity.TipoUsuario;
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 
 /**
  * Interfaz de la capa Dao anotada como Repository que extiende de
@@ -16,6 +16,6 @@ import edix.tfg.consumoCombustiblebk.models.entity.TipoUsuario;
  *
  */
 @Repository
-public interface ITipoUsuarioDao extends JpaRepository<TipoUsuario, Long>{
+public interface ITipoUsuarioDao extends JpaRepository<Rol, Long>{
 
 }

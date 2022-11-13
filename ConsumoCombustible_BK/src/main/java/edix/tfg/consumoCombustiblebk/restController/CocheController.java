@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.models.entity.VersionCoche;
+import edix.tfg.consumoCombustiblebk.services.IMarcaCocheService;
 import edix.tfg.consumoCombustiblebk.services.IRepostajeService;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import edix.tfg.consumoCombustiblebk.services.IVehiculoService;
@@ -36,5 +37,6 @@ public class CocheController {
 	@Autowired
 	IVersionCocheService iVersionCocheService;
 	
-	
+	@Autowired
+	IMarcaCocheService iMarcaCocheService;
 }
