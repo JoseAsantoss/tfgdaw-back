@@ -216,7 +216,7 @@ public class RepostajeController {
 		Vehiculo vehiculo = repostajePrevio.getVehiculo();
 
 		log.info("El vehículo del repostaje " + repostajeId + 
-				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcasCoche().getMarcaNombre() + 
+				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcaCoche().getMarcaNombre() + 
 				" modelo " + vehiculo.getVersionCoche().getModelosCoche().getModeloNombre() + 
 				" versión " + vehiculo.getVersionCoche().getVersionNombre() + 
 				" con matrícula " + vehiculo.getVehiculoMatricula());

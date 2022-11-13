@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edix.tfg.consumoCombustiblebk.models.entity.MarcaCoche;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.models.entity.VersionCoche;
@@ -30,7 +31,7 @@ import edix.tfg.consumoCombustiblebk.services.IVersionCocheService;
 import lombok.extern.log4j.Log4j2;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/coches")
 @Log4j2
 public class CocheController {
 	
@@ -39,4 +40,21 @@ public class CocheController {
 	
 	@Autowired
 	IMarcaCocheService iMarcaCocheService;
+	
+	@GetMapping("/marcas")
+	public ResponseEntity<?> listarMarcas(){
+		
+		List<MarcaCoche> listaMarcas = new ArrayList<>();
+		
+		try {
+			listaMarcas = iMarcaCocheService.listAllMarcas();			
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);			
+		}
+		
+		return new ResponseEntity<List<MarcaCoche>>(listaMarcas, HttpStatus.OK);
+	}
 }

@@ -255,7 +255,7 @@ public class MantenimientoController {
 		Vehiculo vehiculo = mantenimientoEditar.getVehiculo();
 
 		log.info("El vehículo del Mantenimiento " + mantenimientoId + 
-				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcasCoche().getMarcaNombre() + 
+				" es el " + vehiculo.getVersionCoche().getModelosCoche().getMarcaCoche().getMarcaNombre() + 
 				" modelo " + vehiculo.getVersionCoche().getModelosCoche().getModeloNombre() + 
 				" versión " + vehiculo.getVersionCoche().getVersionNombre() + 
 				" con matrícula " + vehiculo.getVehiculoMatricula());

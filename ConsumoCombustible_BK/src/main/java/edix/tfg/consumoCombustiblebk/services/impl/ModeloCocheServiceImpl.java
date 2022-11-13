@@ -30,16 +30,14 @@ public class ModeloCocheServiceImpl implements IModeloCocheService {
 		return iModeloCocheDao.getById(modeloId);
 	}
 
-	@Override
+	/*@Override
 	public List<ModeloCoche> listAllModelosFromMarca(MarcaCoche marca) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		return iModeloCocheDao.findByMarcaId(marca.getMarcaId());
+	}*/
 
 	@Override
 	public List<ModeloCoche> listAllModelosFromMarca(Long marcaCocheId) {
-		// TODO Auto-generated method stub
-		return null;
+		return iModeloCocheDao.findByMarcaId(marcaCocheId);
 	}
 	
 	
