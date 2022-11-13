@@ -1,8 +1,12 @@
 package edix.tfg.consumoCombustiblebk.restController;
 
+import java.text.ParseException;
+
 import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -16,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
@@ -34,24 +40,32 @@ public class UsuarioController {
 	
 	/**
 	 * End point para listar todos los usuarios de la aplicacion
+	 * 
+	 * Mediante parámetros en la cabecera se pueden realizar filtrado 
+	 * de los usuarios, con parámetro de búsqueda, y 
+	 * además parámetros varios para elegir buscar por cada uno de 
+	 * los atributos del usuario (nombre, apellido1, apellido2, email)
+	 * 
 	 * @return List<Usuario> con los usuarios.
 	 */
 	@GetMapping({"/usuarios", "/usuarios/"})
-	public ResponseEntity<?> listaUsuarios() {
+	public ResponseEntity<?> listaUsuarios(){
 		
 		log.info("Petición de lista de usuarios");
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
+
 		log.info("Se obtiene la lista de ususarios de la base de datos");
 		List<Usuario> listaUsus = iUsuarioService.showUsuarios();
 		
 		if (listaUsus.isEmpty() || listaUsus.size() == 0) {
-			log.info("No se ha obtenido datos de la base de datos");
-			//resp.put("usuarios", listaUsus);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}else {
+			log.error("No se ha obtenido datos de la base de datos");
+			resp.put("error", "No se han obtenido usuarios de la base de datos");
+			return new ResponseEntity<>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		} else {
 			log.info("Lista populada correctamente.");
+			//resp.put("lista", listaUsuarios);
 			log.info("Se envia response y estatus");
 			return new ResponseEntity<>(listaUsus, HttpStatus.OK);
 		}

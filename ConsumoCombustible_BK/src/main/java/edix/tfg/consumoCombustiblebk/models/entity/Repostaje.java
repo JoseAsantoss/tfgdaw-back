@@ -25,7 +25,7 @@ public class Repostaje implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long respotajeId;
+	private Long repostajeId;
 	
 	@Temporal(TemporalType.DATE)
 	private Date repostajeFecha;
