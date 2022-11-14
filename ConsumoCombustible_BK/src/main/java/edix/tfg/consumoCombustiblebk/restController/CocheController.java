@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edix.tfg.consumoCombustiblebk.models.entity.MarcaCoche;
+import edix.tfg.consumoCombustiblebk.models.entity.ModeloCoche;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.models.entity.VersionCoche;
 import edix.tfg.consumoCombustiblebk.services.IMarcaCocheService;
+import edix.tfg.consumoCombustiblebk.services.IModeloCocheService;
 import edix.tfg.consumoCombustiblebk.services.IRepostajeService;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import edix.tfg.consumoCombustiblebk.services.IVehiculoService;
@@ -37,6 +39,9 @@ public class CocheController {
 	
 	@Autowired
 	IVersionCocheService iVersionCocheService;
+	
+	@Autowired
+	IModeloCocheService iModeloCocheService;
 	
 	@Autowired
 	IMarcaCocheService iMarcaCocheService;
@@ -56,5 +61,23 @@ public class CocheController {
 		}
 		
 		return new ResponseEntity<List<MarcaCoche>>(listaMarcas, HttpStatus.OK);
+	}
+	
+	@GetMapping("marca/{marcaId}/modelos")
+	public ResponseEntity<?> listarModelos(
+			@PathVariable Long marcaId){
+		
+		List<ModeloCoche> listaModelos = new ArrayList<>();
+		
+		try {
+			listaModelos = iModeloCocheService.listAllModelosFromMarca(marcaId);			
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);			
+		}
+		
+		return new ResponseEntity<List<ModeloCoche>>(listaModelos, HttpStatus.OK);
 	}
 }
