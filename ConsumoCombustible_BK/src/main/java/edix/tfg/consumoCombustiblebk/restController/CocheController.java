@@ -80,4 +80,23 @@ public class CocheController {
 		
 		return new ResponseEntity<List<ModeloCoche>>(listaModelos, HttpStatus.OK);
 	}
+	
+	@GetMapping("marca/{marcaId}/modelo/{modeloId}/versiones")
+	public ResponseEntity<?> listarVersiones(
+			@PathVariable Long marcaId,
+			@PathVariable Long modeloId){
+		
+		List<VersionCoche> listaVersiones = new ArrayList<>();
+		
+		try {
+			listaVersiones = iVersionCocheService.listAllVersionesFromModelo(modeloId);			
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);			
+		}
+		
+		return new ResponseEntity<List<VersionCoche>>(listaVersiones, HttpStatus.OK);
+	}
 }

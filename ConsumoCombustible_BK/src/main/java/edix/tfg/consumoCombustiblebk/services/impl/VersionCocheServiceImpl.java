@@ -1,5 +1,7 @@
 package edix.tfg.consumoCombustiblebk.services.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,11 @@ public class VersionCocheServiceImpl implements IVersionCocheService {
 	@Override
 	public VersionCoche showByVersionId(Long versionId) {
 		return iVersionCocheDao.findById(versionId).orElse(null);
+	}
+
+	@Override
+	public List<VersionCoche> listAllVersionesFromModelo(Long modeloId) {
+		return iVersionCocheDao.findByModeloId(modeloId);
 	}
 
 }
