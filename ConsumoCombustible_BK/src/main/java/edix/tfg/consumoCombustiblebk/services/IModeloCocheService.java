@@ -10,4 +10,5 @@ public interface IModeloCocheService {
 	public ModeloCoche showByModeloId(Long modeloId);
 	//public List<ModeloCoche> listAllModelosFromMarca(MarcaCoche marca);
 	public List<ModeloCoche> listAllModelosFromMarca(Long marcaCocheId);
+	public ModeloCoche addModeloCoche(ModeloCoche modeloCocheJson);
 }

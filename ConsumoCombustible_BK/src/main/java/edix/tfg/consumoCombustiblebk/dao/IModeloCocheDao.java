@@ -14,5 +14,14 @@ public interface IModeloCocheDao extends JpaRepository<ModeloCoche, Long> {
 	@Query("SELECT mc FROM ModeloCoche mc "
 			+ "WHERE mc.marcaCoche.marcaId = ?1")
 	public List<ModeloCoche> findByMarcaId(Long marcaId);
+	
+	@Query("SELECT mc FROM ModeloCoche mc "
+			+ "WHERE mc.marcaCoche.marcaNombre = ?1")
+	public List<ModeloCoche> findByMarcaNombre(String marcaNombre);
+	
+	@Query("SELECT mc FROM ModeloCoche mc "
+			+ "WHERE mc.marcaCoche.marcaId = ?1 "
+			+ "AND mc.modeloNombre = ?2")
+	public List<ModeloCoche> findByModeloNombreMarcaNombre(Long marcaId, String modeloNombre);
 
 }

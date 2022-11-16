@@ -24,6 +24,9 @@ public class ModeloCocheServiceImpl implements IModeloCocheService {
 
 	@Autowired
 	IModeloCocheDao iModeloCocheDao;
+	
+	@Autowired
+	IMarcaCocheService iMarcaCocheService;
 
 	@Override
 	public ModeloCoche showByModeloId(Long modeloId) {
@@ -37,7 +40,13 @@ public class ModeloCocheServiceImpl implements IModeloCocheService {
 
 	@Override
 	public List<ModeloCoche> listAllModelosFromMarca(Long marcaCocheId) {
+		MarcaCoche marcaDelModelo = iMarcaCocheService.showByMarcaId(marcaCocheId);
 		return iModeloCocheDao.findByMarcaId(marcaCocheId);
+	}
+
+	@Override
+	public ModeloCoche addModeloCoche(ModeloCoche modeloCocheJson) {
+		return iModeloCocheDao.save(modeloCocheJson);
 	}
 	
 	

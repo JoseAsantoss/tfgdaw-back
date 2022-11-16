@@ -28,9 +28,31 @@ public class MarcaCocheServiceImpl implements IMarcaCocheService {
 		return iMarcaCocheDao.findById(marcaId).orElse(null);
 	}
 
+
+	@Override
+	public String showNombreMarcaById(Long marcaId) {
+		MarcaCoche marcaNoEncontrada = new MarcaCoche();
+		marcaNoEncontrada.setMarcaNombre("Marca no encontrada");
+		
+		return iMarcaCocheDao.findById(marcaId).orElse(marcaNoEncontrada).getMarcaNombre();
+	}
+
 	@Override
 	public List<MarcaCoche> listAllMarcas() {
 		return iMarcaCocheDao.findAll();
+	}
+
+	@Override
+	public MarcaCoche addMarcaCocheString(String nombreMarca) {
+		MarcaCoche nuevaMarca = new MarcaCoche();
+		nuevaMarca.setMarcaNombre(nombreMarca);
+		
+		return iMarcaCocheDao.save(nuevaMarca);
+	}
+
+	@Override
+	public MarcaCoche addMarcaCoche(MarcaCoche marca) {
+		return iMarcaCocheDao.save(marca);
 	}
 
 

@@ -95,7 +95,7 @@ public class TiposUsuarioController {
 	 * @param idTipoUsuario con el id del TipoUsuario a modificar
 	 * @return ResponseEntity<Map<String, Object>> con el response y el status del servidor.
 	 */
-	@PutMapping("/actualizaTipo/{id}")
+	/*@PutMapping("/actualizaTipo/{id}")
 	public ResponseEntity<?> updateTipoUsuario(@RequestBody Rol tipoUsuario, @PathVariable("id") Long idTipoUsuario){
 		
 		Rol tipoAux = tipoUsuarioService.findById(idTipoUsuario);
@@ -121,7 +121,7 @@ public class TiposUsuarioController {
 		}
 		
 		return new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK);
-	}
+	}*/
 	
 	/**
 	 * Metodo Delete para eliminar un tipo de üsuario en la base de datos

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edix.tfg.consumoCombustiblebk.models.entity.Mantenimiento;
 import edix.tfg.consumoCombustiblebk.models.entity.MarcaCoche;
 import edix.tfg.consumoCombustiblebk.models.entity.ModeloCoche;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
@@ -63,6 +65,24 @@ public class CocheController {
 		return new ResponseEntity<List<MarcaCoche>>(listaMarcas, HttpStatus.OK);
 	}
 	
+	@PostMapping(
+			path = "/marcas/nueva-marca", 
+	        consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> nuevaMarca(
+			@RequestBody MarcaCoche marcaCocheJson
+			){
+		try {
+			iMarcaCocheService.addMarcaCoche(marcaCocheJson);
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se devuelve el objeto response de "
+				+ "/marcas/nueva-marca"
+				+ " más el estado del HttpStatus");
+		return new ResponseEntity<MarcaCoche>(marcaCocheJson, HttpStatus.OK);
+	}
+	
 	@GetMapping("marca/{marcaId}/modelos")
 	public ResponseEntity<?> listarModelos(
 			@PathVariable Long marcaId){
@@ -79,6 +99,42 @@ public class CocheController {
 		}
 		
 		return new ResponseEntity<List<ModeloCoche>>(listaModelos, HttpStatus.OK);
+	}
+	
+	@PostMapping(
+			path = "marca/{marcaId}/nuevo-modelo", 
+	        consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> nuevoModelo(
+			@RequestBody ModeloCoche modeloCocheJson,
+			@PathVariable Long marcaId
+			){
+		//Long marcaIdDelModeloEnviada = modeloCocheJson.getMarcaCoche().getMarcaId();
+		MarcaCoche marcaDelModeloEnviada = modeloCocheJson.getMarcaCoche();
+		
+		if (marcaDelModeloEnviada == null) {
+			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaId);
+			modeloCocheJson.setMarcaCoche(marcaDelModeloEnviada);
+		}
+		
+		if (marcaDelModeloEnviada.getMarcaId() == marcaId) {
+				
+			try {
+				iModeloCocheService.addModeloCoche(modeloCocheJson);
+				
+			} catch (DataAccessException dae){
+				log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
+			log.info("Se devuelve el objeto response de "
+					+ "marca/"+ marcaId +"/nuevo-modelo"
+					+ " más el estado del HttpStatus");
+			return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
+		
+		} else {
+			log.error("La marca de la ruta y la incluida en el modelo no coinciden");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	@GetMapping("marca/{marcaId}/modelo/{modeloId}/versiones")
