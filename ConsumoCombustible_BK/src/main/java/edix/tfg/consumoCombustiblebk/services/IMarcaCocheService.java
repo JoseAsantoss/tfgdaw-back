@@ -11,4 +11,6 @@ public interface IMarcaCocheService {
 	public List<MarcaCoche> listAllMarcas();
 	public MarcaCoche addMarcaCoche(MarcaCoche marca);
 	public MarcaCoche addMarcaCocheString(String nombreMarca);
+	public MarcaCoche deleteMarcaId(Long marcaId);
+	public MarcaCoche findMarcaByNombre(String nombreMarca);
 }

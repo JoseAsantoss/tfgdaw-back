@@ -36,6 +36,11 @@ public class MarcaCocheServiceImpl implements IMarcaCocheService {
 		
 		return iMarcaCocheDao.findById(marcaId).orElse(marcaNoEncontrada).getMarcaNombre();
 	}
+	
+	@Override
+	public MarcaCoche findMarcaByNombre(String nombreMarca) {
+		return iMarcaCocheDao.findByNombre(nombreMarca);
+	}
 
 	@Override
 	public List<MarcaCoche> listAllMarcas() {
@@ -53,6 +58,17 @@ public class MarcaCocheServiceImpl implements IMarcaCocheService {
 	@Override
 	public MarcaCoche addMarcaCoche(MarcaCoche marca) {
 		return iMarcaCocheDao.save(marca);
+	}
+
+
+	@Override
+	public MarcaCoche deleteMarcaId(Long marcaId) {
+		if(iMarcaCocheDao.existsById(marcaId)) {
+			MarcaCoche marcaBorrar = iMarcaCocheDao.findById(marcaId).orElse(null);
+			iMarcaCocheDao.delete(marcaBorrar);
+			return marcaBorrar;
+		} else
+			return null;
 	}
 
 

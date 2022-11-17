@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,10 +82,62 @@ public class CocheController {
 		log.info("Se devuelve el objeto response de "
 				+ "/marcas/nueva-marca"
 				+ " más el estado del HttpStatus");
+		
+		// Si devuelve vacío es que no la ha añadido porque está duplicada
+		// al estar UNIQUE el nombre_marca en la BBDD
 		return new ResponseEntity<MarcaCoche>(marcaCocheJson, HttpStatus.OK);
 	}
 	
-	@GetMapping("marca/{marcaId}/modelos")
+	@DeleteMapping("/marca/{marcaId}")
+	public ResponseEntity<?> borrarMarca(
+			@PathVariable Long marcaId
+			){
+		MarcaCoche marcaBorrar = null;
+		try {
+			marcaBorrar = iMarcaCocheService.showByMarcaId(marcaId);
+			iMarcaCocheService.deleteMarcaId(marcaId);
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se devuelve el objeto response de "
+				+ "/marcas/nueva-marca"
+				+ " más el estado del HttpStatus");
+		
+		// Si devuelve vacío es que no la ha añadido porque está duplicada
+		// al estar UNIQUE el nombre_marca en la BBDD
+		if(marcaBorrar == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} else {
+			return new ResponseEntity<MarcaCoche>(marcaBorrar, HttpStatus.OK);
+		}
+	}
+	
+	@DeleteMapping(
+			path = "/marcas", 
+	        consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> borrarMarca(
+			@RequestBody MarcaCoche marcaCocheJson
+			){
+		String nombreMarca = marcaCocheJson.getMarcaNombre();
+		MarcaCoche marcaAlmacenada = null;
+		try {
+			marcaAlmacenada = iMarcaCocheService.findMarcaByNombre(nombreMarca);
+			iMarcaCocheService.deleteMarcaId(marcaAlmacenada.getMarcaId());
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se devuelve el objeto response de "
+				+ "/marca para DELETE"
+				+ " más el estado del HttpStatus");
+		
+		// Si devuelve vacío es que no la ha añadido porque está duplicada
+		// al estar UNIQUE el nombre_marca en la BBDD
+		return new ResponseEntity<MarcaCoche>(marcaAlmacenada, HttpStatus.OK);
+	}
+	
+	@GetMapping("/marca/{marcaId}/modelos")
 	public ResponseEntity<?> listarModelos(
 			@PathVariable Long marcaId){
 		
@@ -102,42 +156,61 @@ public class CocheController {
 	}
 	
 	@PostMapping(
-			path = "marca/{marcaId}/nuevo-modelo", 
+			path = {"/marca/{marcaId}/nuevo-modelo",
+					"/marcas/nuevo-modelo"}, 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> nuevoModelo(
 			@RequestBody ModeloCoche modeloCocheJson,
-			@PathVariable Long marcaId
+			@PathVariable(required = false) Long marcaId
 			){
-		//Long marcaIdDelModeloEnviada = modeloCocheJson.getMarcaCoche().getMarcaId();
-		MarcaCoche marcaDelModeloEnviada = modeloCocheJson.getMarcaCoche();
 		
+		// Obtener el nombre o ID de MarcaCoche que venga por JSON
+		String nombreMarca = modeloCocheJson.getMarcaCoche().getMarcaNombre();
+		Long marcaIdJson = modeloCocheJson.getMarcaCoche().getMarcaId();
+		
+		// Ver si entre los datos hay una MarcaCoche que tenga el mismo nombre.
+		// Si no la hay, sacarla desde el ID
+		MarcaCoche marcaDelModeloEnviada = iMarcaCocheService.findMarcaByNombre(nombreMarca);		
 		if (marcaDelModeloEnviada == null) {
-			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaId);
-			modeloCocheJson.setMarcaCoche(marcaDelModeloEnviada);
+			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaIdJson);
 		}
+		marcaIdJson = marcaDelModeloEnviada.getMarcaId();
 		
-		if (marcaDelModeloEnviada.getMarcaId() == marcaId) {
-				
-			try {
-				iModeloCocheService.addModeloCoche(modeloCocheJson);
-				
-			} catch (DataAccessException dae){
-				log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-			
-			log.info("Se devuelve el objeto response de "
-					+ "marca/"+ marcaId +"/nuevo-modelo"
-					+ " más el estado del HttpStatus");
-			return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
-		
-		} else {
+		// Si marca por path y JSON no coinciden, y ninguna es null, error
+		if (marcaId != marcaIdJson && marcaId != null) {
 			log.error("La marca de la ruta y la incluida en el modelo no coinciden");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		
+		Long marcaIdDefinitiva = Optional.ofNullable(marcaId).orElse(marcaIdJson);
+		
+		// Si marca por path y JSON son ambas null, error
+		if (marcaIdDefinitiva == null) {
+			log.error("La marca de la ruta y la incluida en el modelo no coinciden");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaIdDefinitiva);
+		modeloCocheJson.setMarcaCoche(marcaDelModeloEnviada);		
+
+		try {
+			iModeloCocheService.addModeloCoche(modeloCocheJson);
+			
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		log.info("Se devuelve el objeto response de "
+				+ "marca/"+ marcaId +"/nuevo-modelo"
+				+ " más el estado del HttpStatus");
+		// Si devuelve vacío es que no la ha añadido porque está duplicado 
+		// el modelo en la misma marca, pues están UNIQUE en conjunto marca_id
+		// y nombre_modelo
+		return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
 	}
 	
-	@GetMapping("marca/{marcaId}/modelo/{modeloId}/versiones")
+	@GetMapping("/marca/{marcaId}/modelo/{modeloId}/versiones")
 	public ResponseEntity<?> listarVersiones(
 			@PathVariable Long marcaId,
 			@PathVariable Long modeloId){
