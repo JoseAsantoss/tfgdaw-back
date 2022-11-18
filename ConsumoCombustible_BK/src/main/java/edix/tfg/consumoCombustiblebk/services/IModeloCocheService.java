@@ -8,6 +8,7 @@ import edix.tfg.consumoCombustiblebk.models.entity.ModeloCoche;
 public interface IModeloCocheService {
 
 	public ModeloCoche showByModeloId(Long modeloId);
+	public ModeloCoche borrarByModeloId(Long modeloId);
 	//public List<ModeloCoche> listAllModelosFromMarca(MarcaCoche marca);
 	public List<ModeloCoche> listAllModelosFromMarca(Long marcaCocheId);
 	public ModeloCoche addModeloCoche(ModeloCoche modeloCocheJson);

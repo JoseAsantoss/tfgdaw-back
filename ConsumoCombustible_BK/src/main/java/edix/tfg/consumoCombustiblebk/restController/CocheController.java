@@ -120,10 +120,17 @@ public class CocheController {
 			@RequestBody MarcaCoche marcaCocheJson
 			){
 		String nombreMarca = marcaCocheJson.getMarcaNombre();
+		Long marcaId = marcaCocheJson.getMarcaId();
+		
 		MarcaCoche marcaAlmacenada = null;
 		try {
-			marcaAlmacenada = iMarcaCocheService.findMarcaByNombre(nombreMarca);
+			if (marcaId == null) {
+				marcaAlmacenada = iMarcaCocheService.findMarcaByNombre(nombreMarca);
+			} else {
+				marcaAlmacenada = iMarcaCocheService.showByMarcaId(marcaId);
+			}			
 			iMarcaCocheService.deleteMarcaId(marcaAlmacenada.getMarcaId());
+			
 		} catch (DataAccessException dae){
 			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -228,4 +235,65 @@ public class CocheController {
 		
 		return new ResponseEntity<List<VersionCoche>>(listaVersiones, HttpStatus.OK);
 	}
+	
+
+	
+	@DeleteMapping("/marca/{marcaId}/modelo/{modeloId}")
+	public ResponseEntity<?> borrarModelo(
+			@PathVariable Long marcaId,
+			@PathVariable Long modeloId
+			){
+		ModeloCoche modeloBorrar = null;
+		try {
+			modeloBorrar = iModeloCocheService.borrarByModeloId(modeloId);
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		log.info("Se devuelve el objeto response del "
+				+ "Modelo borrado"
+				+ " más el estado del HttpStatus");
+		
+		if(modeloBorrar == null) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} else {
+			System.out.println(modeloBorrar);
+			return new ResponseEntity<ModeloCoche>(modeloBorrar, HttpStatus.OK);
+		}
+	}
+	
+	@DeleteMapping(
+			path = {"/marcas/borrar-modelo"}, 
+	        consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> borrarModeloJson(
+			@RequestBody ModeloCoche modeloCocheJson,
+			@PathVariable(required = false) Long marcaId
+			){
+		
+		// Obtener el ID de ModeloCoche que venga por JSON
+		Long modeloIdJson = modeloCocheJson.getModeloId();
+		
+		// Ver si entre los datos hay una ModeloCoche que tenga el mismo nombre.
+		// Si no la hay, sacarla desde el ID
+		ModeloCoche modeloEnviado = iModeloCocheService.showByModeloId(modeloIdJson);		
+		
+		try {
+			iModeloCocheService.borrarByModeloId(modeloIdJson);
+			
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		log.info("Se devuelve el objeto response de "
+				+ "marca/"+ marcaId +"/nuevo-modelo"
+				+ " más el estado del HttpStatus");
+		// Si devuelve vacío es que no la ha añadido porque está duplicado 
+		// el modelo en la misma marca, pues están UNIQUE en conjunto marca_id
+		// y nombre_modelo
+		return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
+	}
+	
+	
 }

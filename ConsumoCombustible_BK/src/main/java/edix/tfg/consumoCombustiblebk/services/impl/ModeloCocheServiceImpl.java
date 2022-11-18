@@ -33,6 +33,19 @@ public class ModeloCocheServiceImpl implements IModeloCocheService {
 		return iModeloCocheDao.getById(modeloId);
 	}
 
+	/**
+	 * Borra el modelo cuya ID se pasa por argumento.
+	 * 
+	 * @param modeloId como Long}.
+	 * @return ModeloCoche que se ha borrado.
+	 */
+	@Override
+	public ModeloCoche borrarByModeloId(Long modeloId) {
+		ModeloCoche modeloBorrar = iModeloCocheDao.getById(modeloId);
+		iModeloCocheDao.deleteById(modeloId);
+		return modeloBorrar;
+	}
+
 	/*@Override
 	public List<ModeloCoche> listAllModelosFromMarca(MarcaCoche marca) {
 		return iModeloCocheDao.findByMarcaId(marca.getMarcaId());
