@@ -33,6 +33,11 @@ public class ModeloCocheServiceImpl implements IModeloCocheService {
 		return iModeloCocheDao.getById(modeloId);
 	}
 
+	@Override
+	public ModeloCoche showByModeloNombre(Long marcaId, String modeloNombre) {
+		return iModeloCocheDao.findByModeloNombreMarcaNombre(marcaId, modeloNombre);
+	}
+
 	/**
 	 * Borra el modelo cuya ID se pasa por argumento.
 	 * 

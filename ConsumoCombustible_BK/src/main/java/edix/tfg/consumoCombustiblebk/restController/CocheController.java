@@ -1,10 +1,7 @@
 package edix.tfg.consumoCombustiblebk.restController;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +15,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import edix.tfg.consumoCombustiblebk.models.entity.Mantenimiento;
 import edix.tfg.consumoCombustiblebk.models.entity.MarcaCoche;
 import edix.tfg.consumoCombustiblebk.models.entity.ModeloCoche;
-import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
-import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.models.entity.VersionCoche;
 import edix.tfg.consumoCombustiblebk.services.IMarcaCocheService;
 import edix.tfg.consumoCombustiblebk.services.IModeloCocheService;
-import edix.tfg.consumoCombustiblebk.services.IRepostajeService;
-import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
-import edix.tfg.consumoCombustiblebk.services.IVehiculoService;
 import edix.tfg.consumoCombustiblebk.services.IVersionCocheService;
 import lombok.extern.log4j.Log4j2;
 
@@ -163,33 +151,39 @@ public class CocheController {
 	}
 	
 	@PostMapping(
-			path = {"/marca/{marcaId}/nuevo-modelo",
+			path = {"/marca/{marcaIdJson}/nuevo-modelo",
 					"/marcas/nuevo-modelo"}, 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> nuevoModelo(
 			@RequestBody ModeloCoche modeloCocheJson,
-			@PathVariable(required = false) Long marcaId
+			@PathVariable(required = false) Long marcaIdJson
 			){
 		
-		// Obtener el nombre o ID de MarcaCoche que venga por JSON
-		String nombreMarca = modeloCocheJson.getMarcaCoche().getMarcaNombre();
-		Long marcaIdJson = modeloCocheJson.getMarcaCoche().getMarcaId();
+		MarcaCoche marcaJson = modeloCocheJson.getMarcaCoche();
+		String nombreMarca = (marcaJson == null)? null : marcaJson.getMarcaNombre();
+		Long marcaId = (marcaJson == null)? marcaIdJson : marcaJson.getMarcaId();
+			
+		//marcaJson = (marcaIdJson == null)? modeloCocheJson.getMarcaCoche() : null;
+				
+		/*if (marcaIdJson != null) {
+			marcaId = (marcaJson.getMarcaId() == null )? marcaId : marcaJson.getMarcaId();
+		} */
 		
 		// Ver si entre los datos hay una MarcaCoche que tenga el mismo nombre.
 		// Si no la hay, sacarla desde el ID
 		MarcaCoche marcaDelModeloEnviada = iMarcaCocheService.findMarcaByNombre(nombreMarca);		
 		if (marcaDelModeloEnviada == null) {
-			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaIdJson);
+			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaId);
 		}
-		marcaIdJson = marcaDelModeloEnviada.getMarcaId();
+		marcaId = marcaDelModeloEnviada.getMarcaId();
 		
 		// Si marca por path y JSON no coinciden, y ninguna es null, error
-		if (marcaId != marcaIdJson && marcaId != null) {
+		/*if (marcaIdJson != marcaIdJson && marcaIdJson != null) {
 			log.error("La marca de la ruta y la incluida en el modelo no coinciden");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		}*/
 		
-		Long marcaIdDefinitiva = Optional.ofNullable(marcaId).orElse(marcaIdJson);
+		Long marcaIdDefinitiva = Optional.ofNullable(marcaId).orElse(marcaId);
 		
 		// Si marca por path y JSON son ambas null, error
 		if (marcaIdDefinitiva == null) {
@@ -209,7 +203,7 @@ public class CocheController {
 		}
 		
 		log.info("Se devuelve el objeto response de "
-				+ "marca/"+ marcaId +"/nuevo-modelo"
+				+ "marca/"+ marcaIdJson +"/nuevo-modelo"
 				+ " más el estado del HttpStatus");
 		// Si devuelve vacío es que no la ha añadido porque está duplicado 
 		// el modelo en la misma marca, pues están UNIQUE en conjunto marca_id
@@ -257,10 +251,12 @@ public class CocheController {
 		
 		if(modeloBorrar == null) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		} else {
-			System.out.println(modeloBorrar);
-			return new ResponseEntity<ModeloCoche>(modeloBorrar, HttpStatus.OK);
 		}
+
+		System.out.println(modeloBorrar.toString());
+		//return new ResponseEntity<ModeloCoche>(modeloBorrar, HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
+		
 	}
 	
 	@DeleteMapping(
@@ -268,11 +264,38 @@ public class CocheController {
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> borrarModeloJson(
 			@RequestBody ModeloCoche modeloCocheJson,
-			@PathVariable(required = false) Long marcaId
+			@PathVariable(required = false) Long marcaIdJson
 			){
 		
 		// Obtener el ID de ModeloCoche que venga por JSON
 		Long modeloIdJson = modeloCocheJson.getModeloId();
+		MarcaCoche marcaCocheJson = modeloCocheJson.getMarcaCoche();				
+		String nombreMarca = marcaCocheJson.getMarcaNombre();
+		Long marcaId = marcaCocheJson.getMarcaId();
+		
+		MarcaCoche marcaAlmacenada = null;
+		try {
+			if (marcaId == null) {
+				marcaAlmacenada = iMarcaCocheService.findMarcaByNombre(nombreMarca);
+			} else {
+				marcaAlmacenada = iMarcaCocheService.showByMarcaId(marcaId);
+			}
+		} catch (DataAccessException dae){
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		modeloCocheJson.setMarcaCoche(marcaCocheJson);
+		
+		try {
+			iModeloCocheService.showByModeloNombre(marcaId, nombreMarca);
+		} catch (Exception e) {
+			log.error("error", "error: ".concat(e.getMessage().concat(" - ").concat(e.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		
+		System.out.println(modeloIdJson);
 		
 		// Ver si entre los datos hay una ModeloCoche que tenga el mismo nombre.
 		// Si no la hay, sacarla desde el ID
@@ -292,7 +315,8 @@ public class CocheController {
 		// Si devuelve vacío es que no la ha añadido porque está duplicado 
 		// el modelo en la misma marca, pues están UNIQUE en conjunto marca_id
 		// y nombre_modelo
-		return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
+		//return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	

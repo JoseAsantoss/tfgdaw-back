@@ -11,8 +11,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+//import lombok.ToString;
 
 @Data
+//@ToString
 @Entity
 @Table(name="modelos_coche")
 public class ModeloCoche implements Serializable {
@@ -26,8 +28,10 @@ public class ModeloCoche implements Serializable {
 	//bi-directional many-to-one association to MarcasCoche
 	@ManyToOne
 	@JoinColumn(name="MARCA_ID")
+	//@ToString.Exclude
 	private MarcaCoche marcaCoche;
 	
 	private static final long serialVersionUID = 1L;
+	
 
 }
