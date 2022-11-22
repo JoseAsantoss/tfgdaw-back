@@ -319,5 +319,34 @@ public class CocheController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@PostMapping(
+			path = {"/marca/{marcaIdJson}/modelo/{modeloIdJson}/nueva-version",
+					"/marcas/nueva-version"}, 
+	        consumes = MediaType.APPLICATION_JSON_VALUE, 
+	        produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> nuevaVersion(
+			@RequestBody VersionCoche versionCocheJson,
+			@PathVariable(required = false) Long modeloIdJson
+			){
+		
+		ModeloCoche modelo = versionCocheJson.getModelosCoche();
+		Long modeloId = (modeloIdJson != null)? modeloIdJson : modelo.getModeloId();
+		VersionCoche version = null;
+		Long versionId = null;
+		
+		try {			
+			modelo = iModeloCocheService.showByModeloId(modeloId);
+			versionCocheJson.setModelosCoche(modelo);
+			version = iVersionCocheService.addVersion(versionCocheJson);
+			versionId = version.getVersionId();
+			version = iVersionCocheService.showByVersionId(versionId);
+		} catch (DataAccessException dae){
+			System.out.println("Entra en el catch");
+			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<VersionCoche>(version, HttpStatus.OK);
+	}
+	
 	
 }

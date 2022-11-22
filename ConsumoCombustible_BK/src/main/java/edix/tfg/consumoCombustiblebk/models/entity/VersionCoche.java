@@ -10,7 +10,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.context.annotation.Lazy;
+
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -31,6 +34,7 @@ public class VersionCoche implements Serializable {
 	//bi-directional many-to-one association to ModelosCoche
 	@ManyToOne
 	@JoinColumn(name="MODELO_ID")
+	@Lazy(false)
 	private ModeloCoche modelosCoche;
 	
 	

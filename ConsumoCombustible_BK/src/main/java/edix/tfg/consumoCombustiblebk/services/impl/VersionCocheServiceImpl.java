@@ -32,5 +32,10 @@ public class VersionCocheServiceImpl implements IVersionCocheService {
 	public List<VersionCoche> listAllVersionesFromModelo(Long modeloId) {
 		return iVersionCocheDao.findByModeloId(modeloId);
 	}
+	
+	@Override
+	public VersionCoche addVersion(VersionCoche version) {
+		return iVersionCocheDao.save(version);
+	}
 
 }
