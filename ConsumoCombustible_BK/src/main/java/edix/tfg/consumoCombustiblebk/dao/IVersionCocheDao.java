@@ -12,6 +12,6 @@ import edix.tfg.consumoCombustiblebk.models.entity.VersionCoche;
 public interface IVersionCocheDao extends JpaRepository<VersionCoche, Long> {
 
 	@Query("SELECT vc FROM VersionCoche vc "
-			+ "WHERE vc.modelosCoche.modeloId = ?1")
+			+ "WHERE vc.modeloCoche.modeloId = ?1")
 	public List<VersionCoche> findByModeloId(Long modeloId);
 }

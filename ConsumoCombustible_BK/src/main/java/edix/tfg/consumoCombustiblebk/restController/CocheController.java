@@ -230,6 +230,26 @@ public class CocheController {
 		return new ResponseEntity<List<VersionCoche>>(listaVersiones, HttpStatus.OK);
 	}
 	
+	@GetMapping("/marca/{marcaId}/modelo/{modeloId}/version/{versionId}")
+	public ResponseEntity<?> buscarVersion(
+			@PathVariable Long marcaId,
+			@PathVariable Long modeloId,
+			@PathVariable Long versionId){
+		
+		VersionCoche version = new VersionCoche();
+		
+		try {
+			version = iVersionCocheService.showByVersionId(versionId);			
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);			
+		}
+		
+		return new ResponseEntity<VersionCoche>(version, HttpStatus.OK);
+	}
+	
 
 	
 	@DeleteMapping("/marca/{marcaId}/modelo/{modeloId}")
@@ -329,23 +349,24 @@ public class CocheController {
 			@PathVariable(required = false) Long modeloIdJson
 			){
 		
-		ModeloCoche modelo = versionCocheJson.getModelosCoche();
+		ModeloCoche modelo = versionCocheJson.getModeloCoche();
 		Long modeloId = (modeloIdJson != null)? modeloIdJson : modelo.getModeloId();
 		VersionCoche version = null;
 		Long versionId = null;
 		
 		try {			
 			modelo = iModeloCocheService.showByModeloId(modeloId);
-			versionCocheJson.setModelosCoche(modelo);
+			versionCocheJson.setModeloCoche(modelo);
 			version = iVersionCocheService.addVersion(versionCocheJson);
 			versionId = version.getVersionId();
 			version = iVersionCocheService.showByVersionId(versionId);
+			System.out.println(version);
 		} catch (DataAccessException dae){
 			System.out.println("Entra en el catch");
 			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<VersionCoche>(version, HttpStatus.OK);
+		return new ResponseEntity<VersionCoche>(version, HttpStatus.CREATED);
 	}
 	
 	

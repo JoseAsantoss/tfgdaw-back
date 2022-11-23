@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Clase Entity que se corresponde con la entidad de base de datos
@@ -21,6 +22,7 @@ import lombok.Data;
  *
  */
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name="roles")
 public class Rol implements Serializable{

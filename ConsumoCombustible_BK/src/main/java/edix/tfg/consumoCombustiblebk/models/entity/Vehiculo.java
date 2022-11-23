@@ -18,13 +18,16 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name="vehiculos")
 public class Vehiculo implements Serializable {
 	
 	@Id
+	@Column(name="VEHICULO_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long vehiculoId;
 	
@@ -34,7 +37,7 @@ public class Vehiculo implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date vehiculoFechaCompra;
 	
-	@Column(unique = true)
+	@Column(unique = true, name="VEHICULO_MATRICULA")
 	private String vehiculoMatricula;
 	
 	//uni-directional many-to-one association to VersionesCoche
