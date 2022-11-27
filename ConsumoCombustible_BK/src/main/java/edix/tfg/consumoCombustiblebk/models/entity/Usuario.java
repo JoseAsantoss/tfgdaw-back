@@ -4,13 +4,16 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -35,6 +38,7 @@ public class Usuario implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long usuarioId;
 	
+	@Column(unique = true)
 	private String usuarioEmail;
 	
 	private String usuarioNombre;
@@ -43,13 +47,25 @@ public class Usuario implements Serializable{
 	
 	private String usuarioApellido2;
 	
-	private String usuarioPassword;
+	private String password;
+	
+	private Boolean enabled;
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="empresa_id")
+	private Empresa empresa;
+	
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name="usuarios_roles", joinColumns= @JoinColumn(name="usuario_id"),
+	inverseJoinColumns=@JoinColumn(name="rol_id"),
+	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "rol_id"})})
+	private List<Rol> roles;
 	
 	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name="usuarios_tipos", joinColumns= @JoinColumn(name="usuario_id"),
-	inverseJoinColumns=@JoinColumn(name="tipo_usuario_id"),
-	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "tipo_usuario_id"})})
-	private List<TipoUsuario> tiposUsuario;
+	@JoinTable(name="usuarios_vehiculos", joinColumns= @JoinColumn(name="usuario_id"),
+	inverseJoinColumns=@JoinColumn(name="vehiculo_id"),
+	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "vehiculo_id"})})
+	private List<Vehiculo> vehiculos;
 	
 	
 	

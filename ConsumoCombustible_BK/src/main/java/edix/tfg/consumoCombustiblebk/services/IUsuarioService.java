@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 
 /**
@@ -25,4 +26,6 @@ public interface IUsuarioService {
 	public Usuario createUsuario(Usuario newUsuario);
 	public Usuario updateUsuario(Usuario updateUsuario);
 	public void deleteUsuario(Long idUsuario);
+	List<Rol> addRolUsuario(List<Rol> roles, Long rol);
+	Usuario findByUsername(String email);
 }

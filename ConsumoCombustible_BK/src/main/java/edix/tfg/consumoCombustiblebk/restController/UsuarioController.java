@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +25,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edix.tfg.consumoCombustiblebk.constants.ApplicationConstants;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import lombok.extern.log4j.Log4j2;
 
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = ApplicationConstants.ORIGINS)
 @RestController
 @RequestMapping("/api")
 @Log4j2
@@ -48,6 +50,7 @@ public class UsuarioController {
 	 * 
 	 * @return List<Usuario> con los usuarios.
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@GetMapping({"/usuarios", "/usuarios/"})
 	public ResponseEntity<?> listaUsuarios(){
 		
@@ -78,6 +81,7 @@ public class UsuarioController {
 	 * @param usuarioId de tipo Long
 	 * @return Usuario buscado
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@GetMapping("/usuario/{usuarioId}")
 	public ResponseEntity<?> UsuarioPorId(@PathVariable Long usuarioId) {
 		log.info("Petición de usuarios por su Id");
@@ -103,6 +107,7 @@ public class UsuarioController {
 	 * @param newUsuario de tipo Usuario
 	 * @return 
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@PostMapping("/usuario/nuevo_usuario")
 	public ResponseEntity<?> altaUsuario(@RequestBody Usuario newUsuario) {
 		log.info("Se da de alta un nuevo usuario");
@@ -131,6 +136,7 @@ public class UsuarioController {
 	 * @param idUsuario de tipo Long
 	 * @return Usuario Modificado
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@PutMapping("/usuario/modifica-usuario/{idUsuario}")
 	public ResponseEntity<?> modificaUsuario(@RequestBody Usuario newUsuario, @PathVariable Long idUsuario) {
 		log.info("Se quiere modificar un usuario");
@@ -150,7 +156,7 @@ public class UsuarioController {
 			log.info("Se actualiza Email");
 			usuActual.setUsuarioEmail(newUsuario.getUsuarioEmail());
 			log.info("Se actualiza password");
-			usuActual.setUsuarioPassword(newUsuario.getUsuarioPassword());
+			usuActual.setPassword(newUsuario.getPassword());
 			
 			try {
 				log.info("Se actualiza el usuario en la base de datos");
@@ -178,6 +184,7 @@ public class UsuarioController {
 	 * @param idUsuario de tipo Long
 	 * @return Usuario Modificado
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@DeleteMapping("/usuario/elimina_usuario/{idUsuario}")
 	public ResponseEntity<?> eliminaUsuario(@PathVariable Long idUsuario) {
 		log.info("Se elimina a un usuario");

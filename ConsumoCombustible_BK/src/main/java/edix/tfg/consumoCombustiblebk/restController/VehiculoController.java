@@ -47,19 +47,15 @@ public class VehiculoController {
 	
 	@PostMapping("/usuario/nuevo-vehiculo")
 	public ResponseEntity<?> altaVehiculoDeUsuario(
-			@RequestBody Vehiculo vehiculo) {
+			@RequestBody Vehiculo vehiculo,
+			@RequestParam Long idUsuario ) {
 		
-		log.info("Usuario " + vehiculo.getUsuario().getUsuarioId() + "da de alta un nuevo vehiculo");
-		Map<String, Object> resp = new HashMap<String, Object>();
+		Map<String, Object> resp = new HashMap<>();
 		log.info("Se recogen los datos del usuario");
-		Usuario usuario = iUsuarioService.showUsuarioById(vehiculo.getUsuario().getUsuarioId());
+		Usuario usuario = iUsuarioService.showUsuarioById(idUsuario);
+		log.info("Usuario " + usuario.getUsuarioNombre() + "da de alta el vehiculo con matriculo " + vehiculo.getVehiculoMatricula());
 		log.info("se recogen los datos de las version de coche");
 		VersionCoche version = iVersionCocheService.showByVersionId(vehiculo.getVersionCoche().getVersionId());
-		
-		if (usuario != null) {
-			log.info("Usuario no es null y se asigna a vehiculo");
-			vehiculo.setUsuario(usuario);
-		}
 		
 		if (version != null) {
 			log.info("Version de vehiculo no es null y se asigna a vehiculo");
@@ -101,7 +97,7 @@ public class VehiculoController {
 		
 		if (params.size() == 0) {
 			try {
-				listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
+				//listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -120,7 +116,7 @@ public class VehiculoController {
 		if (params.containsKey("matricula")) {
 			String matricula = params.get("matricula");
 			try {
-				listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
+				//listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -133,7 +129,7 @@ public class VehiculoController {
 		if (params.containsKey("descripcion")) {
 			String descripcion = params.get("descripcion");
 			try {
-				listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, descripcion);
+				//listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, descripcion);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());

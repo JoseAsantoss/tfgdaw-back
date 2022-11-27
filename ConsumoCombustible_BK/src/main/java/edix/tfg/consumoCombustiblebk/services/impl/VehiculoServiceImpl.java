@@ -28,6 +28,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
 		return iVehiculoDao.save(vehiculo);
 	}
 
+	/*
 	@Override
 	public List<Vehiculo> busquedaVehiculosUsuarioMatricula(Long usuarioId, String buscarMatricula) {
 		return iVehiculoDao.busquedaVehiculosUsuario(usuarioId, buscarMatricula);
@@ -42,7 +43,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
 	public List<Vehiculo> listaVehiculosUsuario(Long usuarioId) {
 		return iVehiculoDao.findVehiculosByUsuario(usuarioId);		
 	}
-
+	*/
 	@Override
 	public Vehiculo detallesVehiculo(Long vehiculoId) {
 		return iVehiculoDao.findById(vehiculoId).orElse(null);

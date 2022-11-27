@@ -21,6 +21,9 @@ import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 @Repository
 public interface IUsuarioDao extends JpaRepository<Usuario, Long>{
 	
+	
+	Usuario findByUsuarioEmail(String email);
+	
 	@Query("SELECT usr from Usuario usr "
 			+ "WHERE usr.usuarioEmail LIKE %?1% ")
 	public List<Usuario> busquedaUsuarioEmail(String busqueda);

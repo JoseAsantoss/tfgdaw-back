@@ -7,8 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -19,34 +17,22 @@ import lombok.Data;
  * @author Luis Cifuentes
  * @author Jose A. Santos
  * @version 1.0
- * @since 03/11/2022
+ * @since 25/10/2022
  *
  */
 @Data
 @Entity
-@Table(name="conductor_empresa")
-public class ConductorEmpresa implements Serializable {
-	
+@Table(name="roles")
+public class Rol implements Serializable{
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long conductorId;
+	@Column(name="ROL_ID")
+	private Long rolId;
 	
-	//bi-directional many-to-one association to Usuario
-	@ManyToOne
-	@JoinColumn(name="USUARIO_ID")
-	private Usuario usuario;
-	
-	@Column(unique = true)
-	private String conductorAlias;
-	
-	private String conductorNombre;
-	
-	private String conductorApellido1;
-	
-	private String conductorApellido2;
-	
-	private String conductorPassword;
+	@Column(name="ROL_DESCRIPCION")
+	private String rolDescripcion;
 	
 	private static final long serialVersionUID = 1L;
-
 }
