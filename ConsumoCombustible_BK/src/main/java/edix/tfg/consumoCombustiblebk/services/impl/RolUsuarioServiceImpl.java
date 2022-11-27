@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import edix.tfg.consumoCombustiblebk.dao.ITipoUsuarioDao;
+
+import edix.tfg.consumoCombustiblebk.dao.IRolUsuarioDao;
 import edix.tfg.consumoCombustiblebk.models.entity.Rol;
-import edix.tfg.consumoCombustiblebk.services.ITipoUsuarioService;
+import edix.tfg.consumoCombustiblebk.services.IRolUsuarioService;
 
 /**
  * Clase Servicio que implementa los metodos del CRUD para 
@@ -22,10 +23,10 @@ import edix.tfg.consumoCombustiblebk.services.ITipoUsuarioService;
  *
  */
 @Service
-public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
+public class RolUsuarioServiceImpl implements IRolUsuarioService {
 
 	@Autowired
-	private ITipoUsuarioDao iTipoUsuarioDao;
+	private IRolUsuarioDao iRolUsuarioDao;
 	
 	/**
 	 * Metodo que devuelve la lista de tipos de usuarios de la aplicacion
@@ -34,7 +35,8 @@ public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Rol> findAll() {
-		return (List<Rol>)iTipoUsuarioDao.findAll();
+
+		return (List<Rol>)iRolUsuarioDao.findAll();
 	}
 	
 	/**
@@ -45,7 +47,7 @@ public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
 	@Override
 	@Transactional(readOnly = true)
 	public Rol findById(Long idTipo) {
-		return iTipoUsuarioDao.findById(idTipo).orElse(null);
+		return iRolUsuarioDao.findById(idTipo).orElse(null);
 	}
 
 	/**
@@ -55,7 +57,7 @@ public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
 	 */
 	@Override
 	public Rol createTipoUsuario(Rol tipoUsuario) {
-		return iTipoUsuarioDao.saveAndFlush(tipoUsuario);
+		return iRolUsuarioDao.saveAndFlush(tipoUsuario);
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
 	 */
 	@Override
 	public Rol updateTipoUsuario(Rol tipoUsuario) {	
-		return iTipoUsuarioDao.saveAndFlush(tipoUsuario);
+		return iRolUsuarioDao.saveAndFlush(tipoUsuario);
 	}
 
 	/**
@@ -77,8 +79,14 @@ public class TipoUsuarioServiceImpl implements ITipoUsuarioService {
 	 */
 	@Override
 	public void deleteTipoUsuario(Long idTipo) {
-		iTipoUsuarioDao.deleteById(idTipo);
+		iRolUsuarioDao.deleteById(idTipo);
 		
+	}
+
+	@Override
+	public Rol findByRolName(String descripcion) {
+		Rol rol = iRolUsuarioDao.findRolByRolDescripcion(descripcion);
+		return rol;
 	}
 
 }

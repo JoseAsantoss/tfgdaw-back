@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 
@@ -27,4 +28,15 @@ public interface IUsuarioService {
 	public Usuario createUsuario(Usuario newUsuario);
 	public Usuario updateUsuario(Usuario updateUsuario);
 	public void deleteUsuario(Long idUsuario);
+	List<Rol> addRolUsuario(List<Rol> roles, Long rol);
+	Usuario findByUsername(String email);
+	/**
+	 * Metodo para buscar usuarios
+	 * @param textoBusqueda de tipo String
+	 * @param 4xBoolean para indicar si busca en email, 
+	 * nombre, o en cada uno de los apellidos.
+	 * @return Usuario buscado
+	 */
+	List<Usuario> searchUsuario(String textoBusqueda, Boolean email, Boolean nombre, Boolean apellido1,
+			Boolean apellido2);
 }

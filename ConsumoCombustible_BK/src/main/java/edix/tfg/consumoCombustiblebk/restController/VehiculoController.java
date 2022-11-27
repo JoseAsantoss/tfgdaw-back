@@ -49,12 +49,22 @@ public class VehiculoController {
 	
 	@PostMapping("/usuario/{usuarioId}/nuevo-vehiculo")
 	public ResponseEntity<?> altaVehiculoDeUsuario(
+<<<<<<< HEAD
 			@PathVariable Long usuarioId, 
 			@RequestBody Vehiculo vehiculo) {
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		log.info("Se recogen los datos del usuario");
 		Usuario usuario = iUsuarioService.showUsuarioById(usuarioId);
+=======
+			@RequestBody Vehiculo vehiculo,
+			@RequestParam Long idUsuario ) {
+		
+		Map<String, Object> resp = new HashMap<>();
+		log.info("Se recogen los datos del usuario");
+		Usuario usuario = iUsuarioService.showUsuarioById(idUsuario);
+		log.info("Usuario " + usuario.getUsuarioNombre() + "da de alta el vehiculo con matriculo " + vehiculo.getVehiculoMatricula());
+>>>>>>> main
 		log.info("se recogen los datos de las version de coche");
 		VersionCoche version = iVersionCocheService.showByVersionId(vehiculo.getVersionCoche().getVersionId());
 		
@@ -106,7 +116,7 @@ public class VehiculoController {
 		
 		if (params.size() == 0) {
 			try {
-				listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
+				//listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -125,7 +135,7 @@ public class VehiculoController {
 		if (params.containsKey("matricula")) {
 			String matricula = params.get("matricula");
 			try {
-				listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
+				//listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -138,7 +148,7 @@ public class VehiculoController {
 		if (params.containsKey("descripcion")) {
 			String descripcion = params.get("descripcion");
 			try {
-				listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, descripcion);
+				//listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, descripcion);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());

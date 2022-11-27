@@ -16,6 +16,8 @@ import edix.tfg.consumoCombustiblebk.models.entity.Rol;
  *
  */
 @Repository
-public interface ITipoUsuarioDao extends JpaRepository<Rol, Long>{
 
+public interface IRolUsuarioDao extends JpaRepository<Rol, Long>{
+	
+	Rol findRolByRolDescripcion(String desc);
 }

@@ -3,8 +3,10 @@ package edix.tfg.consumoCombustiblebk.models.entity;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,10 +15,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Clase Entity que se corresponde con la entidad de base de datos
@@ -30,7 +32,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name="usuarios")
-@NoArgsConstructor
 public class Usuario implements Serializable{
 
 	@Id
@@ -38,7 +39,7 @@ public class Usuario implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long usuarioId;
 
-	@Column(name="USUARIO_EMAIL")
+	@Column(name="USUARIO_EMAIL", unique = true)
 	private String usuarioEmail;
 
 	@Column(name="USUARIO_NOMBRE")
@@ -52,40 +53,25 @@ public class Usuario implements Serializable{
 	
 	private String password;
 	
-	private String username;
-	
-	private int enabled;
-	
-	//uni-directional many-to-one association to Empresas
-	@ManyToOne
-	@JoinColumn(name="EMPRESA_ID")
-	private Empresa empresa;
+	private String username;	
 
-	//uni-directional many-to-many association to Vehiculos
-	@ManyToMany
-	@JoinTable(
-		name="usuarios_vehiculos"
-		, joinColumns={
-			@JoinColumn(name="USUARIO_ID")
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="VEHICULO_ID")
-			}
-		)
-	private List<Vehiculo> vehiculos;
+	private Boolean enabled;
 	
-	//uni-directional many-to-many association to Rol
-	@ManyToMany
-	@JoinTable(
-		name="usuarios_roles"
-		, joinColumns={
-			@JoinColumn(name="USUARIO_ID")
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="ROL_ID")
-			}
-		)
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="empresa_id")
+	private Empresa empresa;
+	
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinTable(name="usuarios_roles", joinColumns= @JoinColumn(name="usuario_id"),
+	inverseJoinColumns=@JoinColumn(name="rol_id"),
+	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "rol_id"})})
 	private List<Rol> roles;
+	
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name="usuarios_vehiculos", joinColumns= @JoinColumn(name="usuario_id"),
+	inverseJoinColumns=@JoinColumn(name="vehiculo_id"),
+	uniqueConstraints= {@UniqueConstraint(columnNames= {"usuario_id", "vehiculo_id"})})
+	private List<Vehiculo> vehiculos;
 	
 	private static final long serialVersionUID = 1L;	
 	

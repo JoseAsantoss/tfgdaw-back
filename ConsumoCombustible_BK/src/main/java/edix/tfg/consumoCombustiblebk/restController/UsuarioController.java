@@ -1,17 +1,21 @@
 package edix.tfg.consumoCombustiblebk.restController;
 
 import java.text.ParseException;
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+<<<<<<< HEAD
+=======
+import org.springframework.security.access.annotation.Secured;
+>>>>>>> main
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +28,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edix.tfg.consumoCombustiblebk.constants.ApplicationConstants;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import lombok.extern.log4j.Log4j2;
 
+<<<<<<< HEAD
 @CrossOrigin(origins= {"http://localhost:4200"})
+=======
+
+@CrossOrigin(origins = ApplicationConstants.ORIGINS)
+>>>>>>> main
 @RestController
 @RequestMapping("/api")
 @Log4j2
@@ -47,64 +57,27 @@ public class UsuarioController {
 	 * 
 	 * @return List<Usuario> con los usuarios.
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@GetMapping({"/usuarios", "/usuarios/"})
-	public ResponseEntity<?> listaUsuarios(
-			@RequestParam Map<String, String> params) 
-					 throws ParseException {
+	public ResponseEntity<?> listaUsuarios(){
 		
 		log.info("Petición de lista de usuarios");
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
-		List<Usuario> listaUsuarios = new ArrayList<Usuario>();		
-		Set<Usuario> listaCombinada = new LinkedHashSet<Usuario>();
+
+		log.info("Se obtiene la lista de ususarios de la base de datos");
+		List<Usuario> listaUsus = iUsuarioService.showUsuarios();
 		
-		if (params.size() == 0) {
-			try {
-				log.info("Se obtiene la lista de usuarios de la base de datos");
-				listaUsuarios = iUsuarioService.showUsuarios();
-			} catch (NullPointerException npe) {
-				log.error(npe.getStackTrace());
-				log.error(npe.getCause());
-				log.error(npe.initCause(npe));
-				resp.put("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
-		
-		if (params.size() > 5) { //Aceptar máx 5 parámetros
-		      throw new ResponseStatusException(
-		    		  HttpStatus.BAD_REQUEST, 
-		    		  "Sólo se pueden incluir 5 parámetros máximo");
-		}		
-		
-		if (params.containsKey("buscar")) {
-			String busqueda = params.get("buscar");
-			
-			if (params.containsKey("email")) {
-				listaCombinada.addAll(iUsuarioService.searchUsuarioEmail(busqueda));
-			}			
-			if (params.containsKey("nombre")) {
-				listaCombinada.addAll(iUsuarioService.searchUsuarioNombre(busqueda));
-			}			
-			if (params.containsKey("apellido1")) {
-				listaCombinada.addAll(iUsuarioService.searchUsuarioApellido1(busqueda));
-			}			
-			if (params.containsKey("apellido2")) {
-				listaCombinada.addAll(iUsuarioService.searchUsuarioApellido2(busqueda));
-			}
-			
-			listaUsuarios = new ArrayList<Usuario>(listaCombinada);		
-		}
-		
-		if (listaUsuarios.isEmpty() || listaUsuarios.size() == 0) {
-			log.info("No se ha obtenido datos de la base de datos");
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		if (listaUsus.isEmpty() || listaUsus.size() == 0) {
+			log.error("No se ha obtenido datos de la base de datos");
+			resp.put("error", "No se han obtenido usuarios de la base de datos");
+			return new ResponseEntity<>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
 			log.info("Lista populada correctamente.");
-			resp.put("lista", listaUsuarios);
+			//resp.put("lista", listaUsuarios);
 			log.info("Se envia response y estatus");
-			return new ResponseEntity<>(resp, HttpStatus.OK);
+			return new ResponseEntity<>(listaUsus, HttpStatus.OK);
 		}
 
 	}
@@ -115,6 +88,7 @@ public class UsuarioController {
 	 * @param usuarioId de tipo Long
 	 * @return Usuario buscado
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@GetMapping("/usuario/{usuarioId}")
 	public ResponseEntity<?> UsuarioPorId(@PathVariable Long usuarioId) {
 		log.info("Petición de usuarios por su Id");
@@ -140,6 +114,7 @@ public class UsuarioController {
 	 * @param newUsuario de tipo Usuario
 	 * @return 
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@PostMapping("/usuario/nuevo_usuario")
 	public ResponseEntity<?> altaUsuario(@RequestBody Usuario newUsuario) {
 		log.info("Se da de alta un nuevo usuario");
@@ -168,6 +143,7 @@ public class UsuarioController {
 	 * @param idUsuario de tipo Long
 	 * @return Usuario Modificado
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@PutMapping("/usuario/modifica-usuario/{idUsuario}")
 	public ResponseEntity<?> modificaUsuario(@RequestBody Usuario newUsuario, @PathVariable Long idUsuario) {
 		log.info("Se quiere modificar un usuario");
@@ -215,6 +191,7 @@ public class UsuarioController {
 	 * @param idUsuario de tipo Long
 	 * @return Usuario Modificado
 	 */
+	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@DeleteMapping("/usuario/elimina_usuario/{idUsuario}")
 	public ResponseEntity<?> eliminaUsuario(@PathVariable Long idUsuario) {
 		log.info("Se elimina a un usuario");

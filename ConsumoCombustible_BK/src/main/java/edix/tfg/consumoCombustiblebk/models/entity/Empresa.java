@@ -1,7 +1,6 @@
 package edix.tfg.consumoCombustiblebk.models.entity;
 
 import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,9 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Clase Entity que se corresponde con la entidad de base de datos
@@ -22,23 +19,23 @@ import lombok.NoArgsConstructor;
  * @since 13/11/2022
  *
  */
+
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name="empresas")
-public class Empresa implements Serializable{
+public class Empresa implements Serializable {
 
 	@Id
-	@Column(name="EMPRESA_ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long empresaId;
-
-	@Column(name="EMPRESA_CIF")
-	private String empresaCif;
-
-	@Column(name="EMPRESA_RAZON_SOCIAL")
-	private String empresaRazonSocial;
 	
-	private static final long serialVersionUID = 1L;	
+	@Column(name="empresa_cif", length = 15, unique = true)
+	private String cif;
+	//	private String empresaCif;
 	
+	@Column(name="empresa_razon_social", length = 100)
+	private String razonSocial;
+	//	private String empresaRazonSocial;	
+
+	private static final long serialVersionUID = 1L;
 }

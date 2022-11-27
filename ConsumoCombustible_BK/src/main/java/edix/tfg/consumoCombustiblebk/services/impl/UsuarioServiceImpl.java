@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import edix.tfg.consumoCombustiblebk.dao.IRolUsuarioDao;
 import edix.tfg.consumoCombustiblebk.dao.IUsuarioDao;
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
@@ -27,6 +29,9 @@ public class UsuarioServiceImpl implements IUsuarioService{
 
 	@Autowired
 	private IUsuarioDao iUsuarioDao;
+	
+	@Autowired
+	private IRolUsuarioDao iRolUsuarioDao;
 	
 	/**
 	 * Metodo para mostrar todos los usuarios de la aplicacion
@@ -58,7 +63,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	 */
 	
 	//https://www.digitalocean.com/community/tutorials/set-to-list-in-java
-	/*@Transactional(readOnly = true)
+	@Transactional(readOnly = true)
 	@Override
 	public List<Usuario> searchUsuario(
 			String textoBusqueda,
@@ -88,7 +93,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		List<Usuario> listaUsuarios = new ArrayList<Usuario>(listaCombinada);
 		
 		return listaUsuarios;
-	}*/
+	}
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -153,4 +158,30 @@ public class UsuarioServiceImpl implements IUsuarioService{
 		return usuario.getVehiculos();
 	}
 
+	public List<Rol> addRolUsuario(List<Rol> roles, Long rol) {
+		
+		if (roles != null) {
+			if(roles.contains(iRolUsuarioDao.getById(rol))) {
+				return null;
+			}
+		}
+		
+		roles = new ArrayList<Rol>();
+		
+		int size = roles.size();
+		if(size != 0) size +=1;
+		
+		roles.add(size, iRolUsuarioDao.getById(rol));
+		return roles;
+	}
+
+	@Override
+	public Usuario findByUsername(String email) {
+		Usuario u = null;
+		
+		if(email != null || email != "") {
+			u = iUsuarioDao.findByUsuarioEmail(email);
+		}
+		return u;
+	}
 }
