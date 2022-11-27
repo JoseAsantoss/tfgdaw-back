@@ -12,11 +12,12 @@ import edix.tfg.consumoCombustiblebk.models.entity.Rol;
  * @since 25/10/2022
  *
  */
-public interface ITipoUsuarioService {
+public interface IRolService {
 
 	public List<Rol> findAll();
 	public Rol findById(Long idTipo);
 	public Rol createTipoUsuario(Rol tipoUsuario);
-	public Rol updateTipoUsuario(Rol tipoUsuario);
-	public void deleteTipoUsuario(Long idTipo);
+	public Rol updateRol(Rol tipoUsuario);
+	public void deleteRol(Long idTipo);
+	public Rol findByRolName(String descripcion);
 }

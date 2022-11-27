@@ -53,5 +53,10 @@ public class VehiculoServiceImpl implements IVehiculoService {
 	public Vehiculo detallesVehiculo(Long vehiculoId) {
 		return iVehiculoDao.findById(vehiculoId).orElse(null);
 	}
+
+	@Override
+	public List<Vehiculo> busquedaVehiculosUsuarioVersion(Long usuarioId, String descripcion) {
+		return iUsuarioDao.listarVehiculosUsuarioVersion(usuarioId, descripcion);
+	}
 	
 }

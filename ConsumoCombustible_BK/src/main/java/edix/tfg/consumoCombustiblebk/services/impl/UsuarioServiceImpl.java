@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import edix.tfg.consumoCombustiblebk.dao.IRolUsuarioDao;
+import edix.tfg.consumoCombustiblebk.dao.IRolDao;
 import edix.tfg.consumoCombustiblebk.dao.IUsuarioDao;
 import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
@@ -31,7 +31,7 @@ public class UsuarioServiceImpl implements IUsuarioService{
 	private IUsuarioDao iUsuarioDao;
 	
 	@Autowired
-	private IRolUsuarioDao iRolUsuarioDao;
+	private IRolDao iRolUsuarioDao;
 	
 	/**
 	 * Metodo para mostrar todos los usuarios de la aplicacion

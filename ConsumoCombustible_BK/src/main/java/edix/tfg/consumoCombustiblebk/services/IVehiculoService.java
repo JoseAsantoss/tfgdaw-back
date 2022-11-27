@@ -11,4 +11,5 @@ public interface IVehiculoService {
 	public List<Vehiculo> busquedaVehiculosUsuario(Long usuarioId, String marcaModeloVersion);
 	public List<Vehiculo> busquedaVehiculosUsuarioMatricula(Long usuarioId, String matricula);
 	public Vehiculo detallesVehiculo(Long vehiculoId);
+	public List<Vehiculo> busquedaVehiculosUsuarioVersion(Long usuarioId, String descripcion);
 }

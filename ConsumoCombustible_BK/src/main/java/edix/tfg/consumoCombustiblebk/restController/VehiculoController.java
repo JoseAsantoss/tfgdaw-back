@@ -109,7 +109,7 @@ public class VehiculoController {
 		
 		if (params.size() == 0) {
 			try {
-				//listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
+				listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -128,7 +128,7 @@ public class VehiculoController {
 		if (params.containsKey("matricula")) {
 			String matricula = params.get("matricula");
 			try {
-				//listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
+				listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioMatricula(usuarioId, matricula);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -141,7 +141,7 @@ public class VehiculoController {
 		if (params.containsKey("descripcion")) {
 			String descripcion = params.get("descripcion");
 			try {
-				//listaVehiculos = iVehiculoService.busquedaVehiculosUsuario(usuarioId, descripcion);
+				listaVehiculos = iVehiculoService.busquedaVehiculosUsuarioVersion(usuarioId, descripcion);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());

@@ -1,12 +1,12 @@
 package edix.tfg.consumoCombustiblebk.restController;
 
 import java.text.ParseException;
-
+import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edix.tfg.consumoCombustiblebk.constants.ApplicationConstants;
+import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
+import edix.tfg.consumoCombustiblebk.services.IRolService;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import lombok.extern.log4j.Log4j2;
 
@@ -40,6 +42,9 @@ public class UsuarioController {
 	@Autowired
 	IUsuarioService iUsuarioService;
 	
+	@Autowired
+	IRolService iRolService;
+	
 	/**
 	 * End point para listar todos los usuarios de la aplicacion
 	 * 
@@ -52,25 +57,63 @@ public class UsuarioController {
 	 */
 	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
 	@GetMapping({"/usuarios", "/usuarios/"})
-	public ResponseEntity<?> listaUsuarios(){
+	public ResponseEntity<?> listaUsuarios(
+			@RequestParam Map<String, String> params) 
+					 throws ParseException {
 		
 		log.info("Petición de lista de usuarios");
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
-
-		log.info("Se obtiene la lista de ususarios de la base de datos");
-		List<Usuario> listaUsus = iUsuarioService.showUsuarios();
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>();		
+		Set<Usuario> listaCombinada = new LinkedHashSet<Usuario>();
 		
-		if (listaUsus.isEmpty() || listaUsus.size() == 0) {
-			log.error("No se ha obtenido datos de la base de datos");
-			resp.put("error", "No se han obtenido usuarios de la base de datos");
-			return new ResponseEntity<>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		if (params.size() == 0) {
+			try {
+				log.info("Se obtiene la lista de usuarios de la base de datos");
+				listaUsuarios = iUsuarioService.showUsuarios();
+			} catch (NullPointerException npe) {
+				log.error(npe.getStackTrace());
+				log.error(npe.getCause());
+				log.error(npe.initCause(npe));
+				resp.put("error", "Por favor inténtelo pasados unos minutos");
+				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
+		
+		if (params.size() > 5) { //Aceptar máx 5 parámetros
+		      throw new ResponseStatusException(
+		    		  HttpStatus.BAD_REQUEST, 
+		    		  "Sólo se pueden incluir 5 parámetros máximo");
+		}		
+		
+		if (params.containsKey("buscar")) {
+			String busqueda = params.get("buscar");
+			
+			if (params.containsKey("email")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioEmail(busqueda));
+			}			
+			if (params.containsKey("nombre")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioNombre(busqueda));
+			}			
+			if (params.containsKey("apellido1")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioApellido1(busqueda));
+			}			
+			if (params.containsKey("apellido2")) {
+				listaCombinada.addAll(iUsuarioService.searchUsuarioApellido2(busqueda));
+			}
+			
+			listaUsuarios = new ArrayList<Usuario>(listaCombinada);		
+		}
+		
+		if (listaUsuarios.isEmpty() || listaUsuarios.size() == 0) {
+			log.info("No se ha obtenido datos de la base de datos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		} else {
 			log.info("Lista populada correctamente.");
-			//resp.put("lista", listaUsuarios);
+			resp.put("lista", listaUsuarios);
 			log.info("Se envia response y estatus");
-			return new ResponseEntity<>(listaUsus, HttpStatus.OK);
+			return new ResponseEntity<>(resp, HttpStatus.OK);
 		}
 
 	}
@@ -113,10 +156,26 @@ public class UsuarioController {
 		log.info("Se da de alta un nuevo usuario");
 		
 		Usuario user = new Usuario();
+		List<Rol> rolesUsuario = new ArrayList<Rol>();
+		List<Rol> rolesUsuarioFinal = new ArrayList<Rol>();
+		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
 		try {
+			rolesUsuario = newUsuario.getRoles();
+			for (Rol rol : rolesUsuario) {
+				rol = iRolService.findByRolName(rol.getRolDescripcion());
+				rolesUsuarioFinal.add(rol);
+			}
+			
+			newUsuario.setRoles(rolesUsuarioFinal);
+			System.out.println(newUsuario);
+			
+			
 			log.info("Se manda a base de datos el nuevo usuario");
+			newUsuario.setEnabled(true);
+			newUsuario.setUsername(newUsuario.getUsuarioEmail());
+			System.out.println(newUsuario);
 			user = iUsuarioService.createUsuario(newUsuario);
 			log.info("Usuario creado con éxito");
 			resp.put("mensaje", "Usuario dado de alta con éxito");
@@ -127,7 +186,8 @@ public class UsuarioController {
 			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se envia response y estatus");
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.CREATED);
+		//return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.CREATED);
+		return new ResponseEntity<Usuario>(user, HttpStatus.CREATED);
 	}
 	
 	/**
@@ -143,20 +203,54 @@ public class UsuarioController {
 		
 		log.info("Se recupera el usuario de la base de datos");
 		Usuario usuActual = iUsuarioService.showUsuarioById(idUsuario);
+		
+
+		System.out.println(usuActual);
 	
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
 		if (usuActual != null) {
-			log.info("Se actualiza el nombre");
-			usuActual.setUsuarioNombre(newUsuario.getUsuarioNombre());
-			log.info("Se actualiza apellido1");
-			usuActual.setUsuarioApellido1(newUsuario.getUsuarioApellido1());
-			log.info("Se actualiza apellido2");
-			usuActual.setUsuarioApellido2(newUsuario.getUsuarioApellido2());
-			log.info("Se actualiza Email");
-			usuActual.setUsuarioEmail(newUsuario.getUsuarioEmail());
-			log.info("Se actualiza password");
-			usuActual.setPassword(newUsuario.getPassword());
+			
+			if (newUsuario.getUsuarioNombre() != null) {
+				log.info("Se actualiza el nombre");
+				usuActual.setUsuarioNombre(newUsuario.getUsuarioNombre());
+			}
+			
+			if (newUsuario.getUsuarioApellido1() != null) {
+				log.info("Se actualiza apellido1");
+				usuActual.setUsuarioApellido1(newUsuario.getUsuarioApellido1());
+			}
+			
+			if (newUsuario.getUsuarioApellido2() != null) {
+				log.info("Se actualiza apellido2");
+				usuActual.setUsuarioApellido2(newUsuario.getUsuarioApellido2());
+			}
+			
+			if (newUsuario.getUsuarioEmail() != null) {
+				log.info("Se actualiza Email");
+				usuActual.setUsuarioEmail(newUsuario.getUsuarioEmail());
+			}
+			
+			if (newUsuario.getPassword() != null) {
+				log.info("Se actualiza password");
+				usuActual.setPassword(newUsuario.getPassword());
+			}
+			
+			if (newUsuario.getRoles() != null) {
+				log.info("Se actualizan los roles");
+				List<Rol> rolesUsuario = new ArrayList<Rol>();
+				List<Rol> rolesUsuarioFinal = new ArrayList<Rol>();
+				rolesUsuario = newUsuario.getRoles();
+				for (Rol rol : rolesUsuario) {
+					rol = iRolService.findByRolName(rol.getRolDescripcion());
+					rolesUsuarioFinal.add(rol);
+				}
+				newUsuario.setRoles(rolesUsuarioFinal);
+				
+				usuActual.setRoles(newUsuario.getRoles());
+			}
+			
+			System.out.println(usuActual);
 			
 			try {
 				log.info("Se actualiza el usuario en la base de datos");
@@ -176,7 +270,7 @@ public class UsuarioController {
 		}
 		
 		
-		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
+		return new ResponseEntity<Usuario>(usuActual, HttpStatus.CREATED);
 	}
 	
 	/**

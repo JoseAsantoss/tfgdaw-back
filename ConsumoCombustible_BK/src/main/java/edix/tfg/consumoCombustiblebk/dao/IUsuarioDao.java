@@ -49,6 +49,13 @@ public interface IUsuarioDao extends JpaRepository<Usuario, Long>{
 
 	@Query("SELECT u.vehiculos FROM Usuario u "
 			+ "INNER JOIN u.vehiculos uv "
+			+ "INNER JOIN uv.versionCoche vc "
+			+ "WHERE u.usuarioId = ?1 "
+			+ "AND vc.versionNombre LIKE %?2% ")
+	public List<Vehiculo> listarVehiculosUsuarioVersion(Long usuarioId, String version);
+
+	@Query("SELECT u.vehiculos FROM Usuario u "
+			+ "INNER JOIN u.vehiculos uv "
 			+ "WHERE u.usuarioId = ?1 ")
 	public List<Vehiculo> listarVehiculosUsuario(Long usuarioId);
 
