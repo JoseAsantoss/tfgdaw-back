@@ -49,22 +49,15 @@ public class VehiculoController {
 	
 	@PostMapping("/usuario/{usuarioId}/nuevo-vehiculo")
 	public ResponseEntity<?> altaVehiculoDeUsuario(
-<<<<<<< HEAD
 			@PathVariable Long usuarioId, 
 			@RequestBody Vehiculo vehiculo) {
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		log.info("Se recogen los datos del usuario");
 		Usuario usuario = iUsuarioService.showUsuarioById(usuarioId);
-=======
-			@RequestBody Vehiculo vehiculo,
-			@RequestParam Long idUsuario ) {
-		
-		Map<String, Object> resp = new HashMap<>();
-		log.info("Se recogen los datos del usuario");
-		Usuario usuario = iUsuarioService.showUsuarioById(idUsuario);
+
 		log.info("Usuario " + usuario.getUsuarioNombre() + "da de alta el vehiculo con matriculo " + vehiculo.getVehiculoMatricula());
->>>>>>> main
+
 		log.info("se recogen los datos de las version de coche");
 		VersionCoche version = iVersionCocheService.showByVersionId(vehiculo.getVersionCoche().getVersionId());
 		

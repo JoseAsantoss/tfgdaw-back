@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-<<<<<<< HEAD
-=======
 import org.springframework.security.access.annotation.Secured;
->>>>>>> main
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,12 +30,8 @@ import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import lombok.extern.log4j.Log4j2;
 
-<<<<<<< HEAD
-@CrossOrigin(origins= {"http://localhost:4200"})
-=======
 
 @CrossOrigin(origins = ApplicationConstants.ORIGINS)
->>>>>>> main
 @RestController
 @RequestMapping("/api")
 @Log4j2
