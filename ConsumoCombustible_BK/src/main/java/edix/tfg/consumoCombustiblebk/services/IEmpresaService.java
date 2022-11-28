@@ -10,5 +10,7 @@ public interface IEmpresaService {
 	Empresa altaEmpresa(Empresa empresa);
 	void deleteEmpresa(Long idEmpresa);
 	Empresa updateEmpresa(Empresa empresa);
+	Empresa buscarEmpresaId(Long idEmpresa);
+	Empresa buscarEmpresaCif(String cifEmpresa);
 	
 }

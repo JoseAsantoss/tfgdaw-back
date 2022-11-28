@@ -30,6 +30,10 @@ public interface IUsuarioDao extends JpaRepository<Usuario, Long>{
 	public List<Usuario> busquedaUsuarioEmail(String busqueda);
 	
 	@Query("SELECT usr from Usuario usr "
+			+ "WHERE usr.empresa.cif = ?1 ")
+	public List<Usuario> listarUsuariosEmpresa(String empresaCif);
+	
+	@Query("SELECT usr from Usuario usr "
 			+ "WHERE usr.usuarioNombre LIKE %?1% ")
 	public List<Usuario> busquedaUsuarioNombre(String busqueda);
 	

@@ -39,4 +39,5 @@ public interface IUsuarioService {
 	 */
 	List<Usuario> searchUsuario(String textoBusqueda, Boolean email, Boolean nombre, Boolean apellido1,
 			Boolean apellido2);
+	List<Usuario> searchUsuarioEmpresa(String empresaCif);
 }

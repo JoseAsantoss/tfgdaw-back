@@ -57,7 +57,7 @@ public class Usuario implements Serializable{
 
 	private Boolean enabled;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne/*(cascade = CascadeType.MERGE)*/
 	@JoinColumn(name="empresa_id")
 	private Empresa empresa;
 	

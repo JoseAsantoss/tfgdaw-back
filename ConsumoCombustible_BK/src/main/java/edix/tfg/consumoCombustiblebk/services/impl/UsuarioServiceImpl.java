@@ -122,6 +122,13 @@ public class UsuarioServiceImpl implements IUsuarioService{
 			String textoBusqueda) {
 		return iUsuarioDao.busquedaUsuarioApellido2(textoBusqueda);
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchUsuarioEmpresa(
+			String empresaCif) {
+		return iUsuarioDao.listarUsuariosEmpresa(empresaCif);
+	}
 
 	/**
 	 * Metodo para dar de alta un nuevo usuario en la aplicacion

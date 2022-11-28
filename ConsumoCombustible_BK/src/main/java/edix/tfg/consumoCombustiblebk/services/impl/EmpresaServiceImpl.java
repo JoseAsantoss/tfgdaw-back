@@ -27,7 +27,7 @@ public class EmpresaServiceImpl implements IEmpresaService {
 			return null;
 		}else {
 			try {
-				Empresa emp = iEmpresaDao.save(empresa);
+				Empresa emp = iEmpresaDao.saveAndFlush(empresa);
 				return emp;
 			}catch (Exception e) {
 				System.out.println(e.getMessage());
@@ -35,6 +35,16 @@ public class EmpresaServiceImpl implements IEmpresaService {
 			}
 		}
 		
+	}
+
+	@Override
+	public Empresa buscarEmpresaId(Long idEmpresa) {
+		return iEmpresaDao.findById(idEmpresa).orElse(null);
+	}
+
+	@Override
+	public Empresa buscarEmpresaCif(String cifEmpresa) {
+		return iEmpresaDao.findByCif(cifEmpresa);
 	}
 
 	@Override

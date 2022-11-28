@@ -163,6 +163,31 @@ public class VehiculoController {
 		return new ResponseEntity<List<Vehiculo>>(listaVehiculos, HttpStatus.OK);
 	}
 	
+
+	@GetMapping("/usuario/{usuarioId}/totalVehiculos")
+	public ResponseEntity<?> contarVehiculosUsuario(
+			@PathVariable Long usuarioId) 
+					 throws ParseException {
+
+		List<Vehiculo> listaVehiculos = new ArrayList<Vehiculo>();
+		Integer totalVehiculos;
+		
+			try {
+				listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
+				totalVehiculos = listaVehiculos.size();
+			} catch (NullPointerException npe) {
+				log.error(npe.getStackTrace());
+				log.error(npe.getCause());
+				log.error(npe.initCause(npe));
+				log.error("error", "Por favor inténtelo pasados unos minutos");
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+		log.info("Se devuelve el objeto response " + listaVehiculos.getClass().toString() + " más el estado del HttpStatus");
+		return new ResponseEntity<Integer>(totalVehiculos, HttpStatus.OK);
+	}
+	
+	
 	/**
 	 * Detalles de un vehículo
 	 */

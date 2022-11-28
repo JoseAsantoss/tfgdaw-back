@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edix.tfg.consumoCombustiblebk.constants.ApplicationConstants;
+import edix.tfg.consumoCombustiblebk.models.entity.Empresa;
 import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
+import edix.tfg.consumoCombustiblebk.services.IEmpresaService;
 import edix.tfg.consumoCombustiblebk.services.IRolService;
 import edix.tfg.consumoCombustiblebk.services.IUsuarioService;
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +46,9 @@ public class UsuarioController {
 	
 	@Autowired
 	IRolService iRolService;
+	
+	@Autowired
+	IEmpresaService iEmpresaService;
 	
 	/**
 	 * End point para listar todos los usuarios de la aplicacion
@@ -145,6 +150,101 @@ public class UsuarioController {
 		return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
 	}
 	
+
+	/**
+	 * End point para mostrar los usuarios de una empresa.
+	 * @param usuarioId de tipo Long
+	 * @return Usuario buscado
+	 */
+	@Secured({"ROLE_EMPRESA", "ROLE_ADMIN"})
+	@GetMapping("/usuarios/{empresaCif}/todos")
+	public ResponseEntity<List<Usuario>> listaUsuariosEmpresa(@PathVariable String empresaCif) {
+		log.info("Petición de todos los usuarios de una empresa por su cif");
+		
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>();
+		
+		try {
+			log.info("Recuperar lista de usuarios de la base de datos");
+			listaUsuarios = iUsuarioService.searchUsuarioEmpresa(empresaCif);
+			
+		}catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se envia response y estatus");
+		return new ResponseEntity<List<Usuario>>(listaUsuarios, HttpStatus.OK);
+	}
+	
+
+	/**
+	 * End point para mostrar los usuarios de una empresa.
+	 * @param usuarioId de tipo Long
+	 * @return Usuario buscado
+	 */
+	@Secured({"ROLE_EMPRESA", "ROLE_ADMIN"})
+	@GetMapping("/usuarios/{empresaCif}")
+	public ResponseEntity<List<Usuario>> listaConductoresEmpresa(@PathVariable String empresaCif) {
+		log.info("Petición de usuarios conductores de una empresa por su cif");
+		
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>();
+		List<Usuario> listaConductores = new ArrayList<Usuario>();
+		
+		try {
+			log.info("Recuperar lista de usuarios de la base de datos");
+			listaUsuarios = iUsuarioService.searchUsuarioEmpresa(empresaCif);
+			
+			for (Usuario u : listaUsuarios) {
+				if (u.getRoles().contains(iRolService.findByRolName("ROLE_CONDUCTOR"))) {
+					listaConductores.add(u);
+				}
+			}
+			
+		}catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se envia response y estatus");
+		return new ResponseEntity<List<Usuario>>(listaConductores, HttpStatus.OK);
+	}
+	
+
+	/**
+	 * End point para mostrar los usuarios de una empresa.
+	 * @param usuarioId de tipo Long
+	 * @return Usuario buscado
+	 */
+	@Secured({"ROLE_EMPRESA", "ROLE_ADMIN"})
+	@GetMapping("/usuarios/{empresaCif}/contar")
+	public ResponseEntity<Integer> contarConductoresEmpresa(@PathVariable String empresaCif) {
+		log.info("Petición de usuarios conductores de una empresa por su cif");
+		
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>();
+		Integer cantidadConductoresEmpresa = 0;
+		
+		try {
+			log.info("Recuperar lista de usuarios de la base de datos");
+			listaUsuarios = iUsuarioService.searchUsuarioEmpresa(empresaCif);
+			
+			for (Usuario u : listaUsuarios) {
+				if (u.getRoles().contains(iRolService.findByRolName("ROLE_CONDUCTOR"))) {
+					cantidadConductoresEmpresa++;
+				}
+			}
+			
+		}catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		log.info("Se envía la cantidad de conductores de la empresa y el estatus");
+		return new ResponseEntity<Integer>(cantidadConductoresEmpresa, HttpStatus.OK);
+	}
+	
 	/**
 	 * Metodo para dar de alta un nuevo usuario
 	 * @param newUsuario de tipo Usuario
@@ -158,6 +258,7 @@ public class UsuarioController {
 		Usuario user = new Usuario();
 		List<Rol> rolesUsuario = new ArrayList<Rol>();
 		List<Rol> rolesUsuarioFinal = new ArrayList<Rol>();
+		Empresa empresa = new Empresa();
 		
 		Map<String, Object> resp = new HashMap<String, Object>();
 		
@@ -168,18 +269,28 @@ public class UsuarioController {
 				rolesUsuarioFinal.add(rol);
 			}
 			
-			newUsuario.setRoles(rolesUsuarioFinal);
-			System.out.println(newUsuario);
+			newUsuario.setRoles(rolesUsuarioFinal);			
+			empresa = newUsuario.getEmpresa();
 			
+			if (empresa != null) {
+				if (empresa.getEmpresaId() != null) {
+					newUsuario.setEmpresa(iEmpresaService.buscarEmpresaId(empresa.getEmpresaId()));
+				} else if (empresa.getCif() != null) {
+					if (iEmpresaService.buscarEmpresaCif(empresa.getCif()) != null) {
+						empresa = iEmpresaService.buscarEmpresaCif(empresa.getCif());
+					} else {
+						// Crear empresa con ese CIF
+						empresa = iEmpresaService.altaEmpresa(empresa);
+					}
+					newUsuario.setEmpresa(empresa);
+				}
+			}
 			
 			log.info("Se manda a base de datos el nuevo usuario");
 			newUsuario.setEnabled(true);
 			newUsuario.setUsername(newUsuario.getUsuarioEmail());
-			System.out.println(newUsuario);
 			user = iUsuarioService.createUsuario(newUsuario);
 			log.info("Usuario creado con éxito");
-			resp.put("mensaje", "Usuario dado de alta con éxito");
-			resp.put("usuario", user);
 		}catch(DataAccessException dae) {
 			log.error("Error al realizar el insert en la base de datos");
 			log.error(dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
