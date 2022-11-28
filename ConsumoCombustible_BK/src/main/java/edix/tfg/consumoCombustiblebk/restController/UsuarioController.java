@@ -193,13 +193,7 @@ public class UsuarioController {
 		
 		try {
 			log.info("Recuperar lista de usuarios de la base de datos");
-			listaUsuarios = iUsuarioService.searchUsuarioEmpresa(empresaCif);
-			
-			for (Usuario u : listaUsuarios) {
-				if (u.getRoles().contains(iRolService.findByRolName("ROLE_CONDUCTOR"))) {
-					listaConductores.add(u);
-				}
-			}
+			listaConductores = iUsuarioService.searchConductoresEmpresa(empresaCif, "ROLE_CONDUCTOR");
 			
 		}catch (NullPointerException npe) {
 			log.error(npe.getStackTrace());
@@ -227,13 +221,7 @@ public class UsuarioController {
 		
 		try {
 			log.info("Recuperar lista de usuarios de la base de datos");
-			listaUsuarios = iUsuarioService.searchUsuarioEmpresa(empresaCif);
-			
-			for (Usuario u : listaUsuarios) {
-				if (u.getRoles().contains(iRolService.findByRolName("ROLE_CONDUCTOR"))) {
-					cantidadConductoresEmpresa++;
-				}
-			}
+			cantidadConductoresEmpresa = iUsuarioService.countConductoresEmpresa(empresaCif, "ROLE_CONDUCTOR");
 			
 		}catch (NullPointerException npe) {
 			log.error(npe.getStackTrace());

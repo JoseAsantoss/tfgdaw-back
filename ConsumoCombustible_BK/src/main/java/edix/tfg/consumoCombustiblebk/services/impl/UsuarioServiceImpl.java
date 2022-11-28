@@ -129,6 +129,20 @@ public class UsuarioServiceImpl implements IUsuarioService{
 			String empresaCif) {
 		return iUsuarioDao.listarUsuariosEmpresa(empresaCif);
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Usuario> searchConductoresEmpresa(
+			String empresaCif, String rolDescripcion) {
+		return iUsuarioDao.listarConductoresEmpresa(empresaCif, rolDescripcion);
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Integer countConductoresEmpresa(
+			String empresaCif, String rolDescripcion) {
+		return iUsuarioDao.contarConductoresEmpresa(empresaCif, rolDescripcion);
+	}
 
 	/**
 	 * Metodo para dar de alta un nuevo usuario en la aplicacion

@@ -48,6 +48,11 @@ public class VehiculoServiceImpl implements IVehiculoService {
 	public List<Vehiculo> listaVehiculosUsuario(Long usuarioId) {
 		return iUsuarioDao.findById(usuarioId).orElse(null).getVehiculos();
 	}
+
+	@Override
+	public Integer contarVehiculosUsuario(Long usuarioId) {
+		return iUsuarioDao.contarVehiculosUsuario(usuarioId);
+	}
 	
 	@Override
 	public Vehiculo detallesVehiculo(Long vehiculoId) {

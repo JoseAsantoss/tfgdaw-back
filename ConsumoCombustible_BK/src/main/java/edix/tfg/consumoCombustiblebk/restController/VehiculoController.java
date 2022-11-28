@@ -169,12 +169,10 @@ public class VehiculoController {
 			@PathVariable Long usuarioId) 
 					 throws ParseException {
 
-		List<Vehiculo> listaVehiculos = new ArrayList<Vehiculo>();
 		Integer totalVehiculos;
 		
 			try {
-				listaVehiculos = iVehiculoService.listaVehiculosUsuario(usuarioId);
-				totalVehiculos = listaVehiculos.size();
+				totalVehiculos = iVehiculoService.contarVehiculosUsuario(usuarioId);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
@@ -183,7 +181,7 @@ public class VehiculoController {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-		log.info("Se devuelve el objeto response " + listaVehiculos.getClass().toString() + " más el estado del HttpStatus");
+		log.info("Se devuelve el objeto response " + totalVehiculos.toString() + " más el estado del HttpStatus");
 		return new ResponseEntity<Integer>(totalVehiculos, HttpStatus.OK);
 	}
 	

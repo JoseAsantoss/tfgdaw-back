@@ -12,4 +12,5 @@ public interface IVehiculoService {
 	public List<Vehiculo> busquedaVehiculosUsuarioMatricula(Long usuarioId, String matricula);
 	public Vehiculo detallesVehiculo(Long vehiculoId);
 	public List<Vehiculo> busquedaVehiculosUsuarioVersion(Long usuarioId, String descripcion);
+	public Integer contarVehiculosUsuario(Long usuarioId);
 }

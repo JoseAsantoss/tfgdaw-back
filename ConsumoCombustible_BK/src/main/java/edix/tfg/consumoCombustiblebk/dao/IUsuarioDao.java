@@ -34,6 +34,18 @@ public interface IUsuarioDao extends JpaRepository<Usuario, Long>{
 	public List<Usuario> listarUsuariosEmpresa(String empresaCif);
 	
 	@Query("SELECT usr from Usuario usr "
+			+ "INNER JOIN usr.roles ur "
+			+ "WHERE usr.empresa.cif = ?1 "
+			+ "AND ur.rolDescripcion = ?2")
+	public List<Usuario> listarConductoresEmpresa(String empresaCif, String rolDescripcion);
+	
+	@Query("SELECT COUNT(usr) from Usuario usr "
+			+ "INNER JOIN usr.roles ur "
+			+ "WHERE usr.empresa.cif = ?1 "
+			+ "AND ur.rolDescripcion = ?2")
+	public Integer contarConductoresEmpresa(String empresaCif, String rolDescripcion);
+	
+	@Query("SELECT usr from Usuario usr "
 			+ "WHERE usr.usuarioNombre LIKE %?1% ")
 	public List<Usuario> busquedaUsuarioNombre(String busqueda);
 	
@@ -62,5 +74,10 @@ public interface IUsuarioDao extends JpaRepository<Usuario, Long>{
 			+ "INNER JOIN u.vehiculos uv "
 			+ "WHERE u.usuarioId = ?1 ")
 	public List<Vehiculo> listarVehiculosUsuario(Long usuarioId);
+
+	@Query("SELECT COUNT(uv) FROM Usuario u "
+			+ "INNER JOIN u.vehiculos uv "
+			+ "WHERE u.usuarioId = ?1 ")
+	public Integer contarVehiculosUsuario(Long usuarioId);
 
 }

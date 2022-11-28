@@ -28,8 +28,8 @@ public interface IUsuarioService {
 	public Usuario createUsuario(Usuario newUsuario);
 	public Usuario updateUsuario(Usuario updateUsuario);
 	public void deleteUsuario(Long idUsuario);
-	List<Rol> addRolUsuario(List<Rol> roles, Long rol);
-	Usuario findByUsername(String email);
+	public List<Rol> addRolUsuario(List<Rol> roles, Long rol);
+	public Usuario findByUsername(String email);
 	/**
 	 * Metodo para buscar usuarios
 	 * @param textoBusqueda de tipo String
@@ -37,7 +37,9 @@ public interface IUsuarioService {
 	 * nombre, o en cada uno de los apellidos.
 	 * @return Usuario buscado
 	 */
-	List<Usuario> searchUsuario(String textoBusqueda, Boolean email, Boolean nombre, Boolean apellido1,
+	public List<Usuario> searchUsuario(String textoBusqueda, Boolean email, Boolean nombre, Boolean apellido1,
 			Boolean apellido2);
-	List<Usuario> searchUsuarioEmpresa(String empresaCif);
+	public List<Usuario> searchUsuarioEmpresa(String empresaCif);
+	public List<Usuario> searchConductoresEmpresa(String empresaCif, String rolDescripcion);
+	public Integer countConductoresEmpresa(String empresaCif, String rolDescripcion);
 }
