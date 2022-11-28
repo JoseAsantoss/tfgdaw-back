@@ -14,4 +14,7 @@ public interface IVersionCocheDao extends JpaRepository<VersionCoche, Long> {
 	@Query("SELECT vc FROM VersionCoche vc "
 			+ "WHERE vc.modeloCoche.modeloId = ?1")
 	public List<VersionCoche> findByModeloId(Long modeloId);
+	
+	
+	public VersionCoche findByVersionNombre(String nombre);
 }

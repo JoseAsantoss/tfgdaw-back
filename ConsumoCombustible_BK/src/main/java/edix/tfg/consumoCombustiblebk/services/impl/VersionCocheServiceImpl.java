@@ -27,6 +27,11 @@ public class VersionCocheServiceImpl implements IVersionCocheService {
 	public VersionCoche showByVersionId(Long versionId) {
 		return iVersionCocheDao.findById(versionId).orElse(null);
 	}
+	
+	@Override
+	public VersionCoche showByDescripcion(String descripcion) {
+		return iVersionCocheDao.findByVersionNombre(descripcion);
+	}
 
 	@Override
 	public List<VersionCoche> listAllVersionesFromModelo(Long modeloId) {

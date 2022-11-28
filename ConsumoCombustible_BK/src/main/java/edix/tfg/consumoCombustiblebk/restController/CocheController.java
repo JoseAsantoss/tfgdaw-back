@@ -354,19 +354,22 @@ public class CocheController {
 		VersionCoche version = null;
 		Long versionId = null;
 		
-		try {			
-			modelo = iModeloCocheService.showByModeloId(modeloId);
-			versionCocheJson.setModeloCoche(modelo);
-			version = iVersionCocheService.addVersion(versionCocheJson);
-			versionId = version.getVersionId();
-			version = iVersionCocheService.showByVersionId(versionId);
-			System.out.println(version);
-		} catch (DataAccessException dae){
-			System.out.println("Entra en el catch");
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return new ResponseEntity<VersionCoche>(version, HttpStatus.CREATED);
+					
+			try {			
+				modelo = iModeloCocheService.showByModeloId(modeloId);
+				versionCocheJson.setModeloCoche(modelo);
+				version = iVersionCocheService.addVersion(versionCocheJson);
+				versionId = version.getVersionId();
+				version = iVersionCocheService.showByVersionId(versionId);
+				System.out.println(version);
+			} catch (DataAccessException dae){
+				System.out.println("Entra en el catch");
+				log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			return new ResponseEntity<VersionCoche>(version, HttpStatus.CREATED);
+		
+		
 	}
 	
 	

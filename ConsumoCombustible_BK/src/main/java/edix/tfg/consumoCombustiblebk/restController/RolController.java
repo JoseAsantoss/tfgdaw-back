@@ -116,7 +116,7 @@ public class RolController {
 			} else {			
 				try {
 					tipoAux = rolService.updateRol(rolUsuario);
-					response.put("mensaje", "Tipo actualizado con éxito");
+					response.put("mensaje", "Rol actualizado con éxito");
 					response.put("tipoUsuario", tipoAux);
 				}catch(DataAccessException dae) {
 					response.put("mensaje", "Error al actualizar en la base de datos");
@@ -126,7 +126,7 @@ public class RolController {
 			}
 			
 		} else {
-			response.put("mensaje", "El usuario a actualizar no existe");
+			response.put("mensaje", "El rol a actualizar no existe");
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.I_AM_A_TEAPOT);
 		}
 		
@@ -145,7 +145,7 @@ public class RolController {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
 			rolService.deleteRol(idUsaurioTipo);
-			response.put("mensaje", "Tipo de usuario eliminado con éxito");
+			response.put("mensaje", "Rol eliminado con éxito");
 			return new ResponseEntity<Map<String,Object>>(response, HttpStatus.OK);
 		}catch(DataAccessException dae) {
 			response.put("mensaje", "Error al eliminar en la base de datos");

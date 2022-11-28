@@ -224,6 +224,7 @@ public class RepostajeController {
 				" con matrícula " + vehiculo.getVehiculoMatricula());
 		
 		repostajeJson.setRepostajeId(repostajeId);
+		repostajeJson.setVehiculo(vehiculo);
 		
 		//Map<String, Object> resp = new HashMap<String, Object>();
 	

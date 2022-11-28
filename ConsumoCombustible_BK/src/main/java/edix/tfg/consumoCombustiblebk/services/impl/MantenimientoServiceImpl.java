@@ -129,7 +129,7 @@ public class MantenimientoServiceImpl implements IMantenimientoService{
 	 */	
 	@Override
 	public Mantenimiento editMantenimiento(Mantenimiento editarMantenimiento) {
-		return iMantenimientoDao.save(editarMantenimiento);
+		return iMantenimientoDao.saveAndFlush(editarMantenimiento);
 	}
 
 

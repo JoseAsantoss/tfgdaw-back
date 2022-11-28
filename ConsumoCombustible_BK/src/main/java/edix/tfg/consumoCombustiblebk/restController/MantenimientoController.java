@@ -2,11 +2,16 @@ package edix.tfg.consumoCombustiblebk.restController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -151,7 +156,15 @@ public class MantenimientoController {
 		//Map<String, Object> resp = new HashMap<String, Object>();
 		
 		try {
-			iMantenimientoService.addMantenimiento(mantenimientoJson);
+			
+			Vehiculo vehiculoPath = iVehiculoService.detallesVehiculo(vehiculoId);
+			if (vehiculoId != mantenimientoJson.getVehiculo().getVehiculoId()) {
+				log.error("error", "No coincide el id del vehículo en el Path con el id del vehículo del JSON");
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			} else {
+				mantenimientoJson.setVehiculo(vehiculoPath);
+				iMantenimientoService.addMantenimiento(mantenimientoJson);
+			}
 			
 		} catch (DataAccessException dae) {
 			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
@@ -245,35 +258,65 @@ public class MantenimientoController {
 	
 	/**
 	 * Modificar un Mantenimiento concreto por su ID
+	 * @throws ParseException 
 	 */
 	@PutMapping("/{vehiculoId}/mantenimiento/{mantenimientoId}/editar-mantenimiento")
 	public ResponseEntity<?> modificarMantenimiento(
 			@PathVariable Long mantenimientoId,
-			@RequestBody Mantenimiento mantenimientoJson) {
+			@RequestBody Mantenimiento mantenimientoJson) throws ParseException {
 		
 		log.info("Modificar el Mantenimiento con id: " + mantenimientoId);
 		
 		Mantenimiento mantenimientoEditar = iMantenimientoService.showMantenimiento(mantenimientoId);
 		Vehiculo vehiculo = mantenimientoEditar.getVehiculo();
+		
 
+		System.out.println(mantenimientoEditar.getMantenimientoFecha());
+		System.out.println(mantenimientoJson.getMantenimientoFecha());
+		
 		log.info("El vehículo del Mantenimiento " + mantenimientoId + 
 				" es el " + vehiculo.getVersionCoche().getModeloCoche().getMarcaCoche().getMarcaNombre() + 
 				" modelo " + vehiculo.getVersionCoche().getModeloCoche().getModeloNombre() + 
 				" versión " + vehiculo.getVersionCoche().getVersionNombre() + 
 				" con matrícula " + vehiculo.getVehiculoMatricula());
 		
-		mantenimientoJson.setMantenimientoId(mantenimientoId);
+		if (mantenimientoEditar != null) {
+			
+			if (mantenimientoJson.getMantenimientoDetalle() != null) {
+				log.info("Actualizar detalle de Mantenimiento");
+				mantenimientoEditar.setMantenimientoDetalle(mantenimientoJson.getMantenimientoDetalle());
+			}
+			
+			if (mantenimientoJson.getMantenimientoFecha() != null) {
+				log.info("Actualizar fecha de Mantenimiento");
+				mantenimientoEditar.setMantenimientoFecha(mantenimientoJson.getMantenimientoFecha());
+			}
+			
+			if (mantenimientoJson.getMantenimientoImporte() != null) {
+				log.info("Actualizar detalle de Mantenimiento");
+				mantenimientoEditar.setMantenimientoImporte(mantenimientoJson.getMantenimientoImporte());
+			}
+			
+			if (mantenimientoJson.getMantenimientoKM() != null) {
+				log.info("Actualizar km de Mantenimiento");
+				mantenimientoEditar.setMantenimientoKM(mantenimientoJson.getMantenimientoKM());
+			}
+			
+			if (mantenimientoJson.getMantenimientoObservaciones() != null) {
+				log.info("Actualizar detalle de Mantenimiento");
+				mantenimientoEditar.setMantenimientoObservaciones(mantenimientoJson.getMantenimientoObservaciones());
+			}
+		}
 		
 		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Modificar el Mantenimiento de la BBDD");
-			iMantenimientoService.editMantenimiento(mantenimientoJson);
-			
+			iMantenimientoService.editMantenimiento(mantenimientoEditar);
 			log.info("Mantenimiento modificado con éxito");
 			//resp.put("mensaje", "Mantenimiento modificado satisfactoriamente");
-			
-			return new ResponseEntity<Mantenimiento>(mantenimientoEditar, HttpStatus.OK);
+						
+			return new ResponseEntity<Mantenimiento>(mantenimientoEditar, HttpStatus.CREATED);
 			
 		} catch(DataAccessException dae) {		
 			
