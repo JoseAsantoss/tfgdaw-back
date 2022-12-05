@@ -108,7 +108,7 @@ public class UsuarioController {
 	 * @return 
 	 */
 	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
-	@PostMapping("/usuario/nuevo_usuario")
+	@PostMapping("/usuario/nuevo-usuario")
 	public ResponseEntity<?> altaUsuario(@RequestBody Usuario newUsuario) {
 		log.info("Se da de alta un nuevo usuario");
 		
@@ -185,7 +185,7 @@ public class UsuarioController {
 	 * @return Usuario Modificado
 	 */
 	@Secured({"ROLE_PARTICULAR", "ROLE_EMPRESA", "ROLE_ADMIN"})
-	@DeleteMapping("/usuario/elimina_usuario/{idUsuario}")
+	@DeleteMapping("/usuario/elimina-usuario/{idUsuario}")
 	public ResponseEntity<?> eliminaUsuario(@PathVariable Long idUsuario) {
 		log.info("Se elimina a un usuario");
 		Map<String, Object> resp = new HashMap<String, Object>();
