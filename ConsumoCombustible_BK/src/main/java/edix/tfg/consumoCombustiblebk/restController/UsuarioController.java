@@ -253,6 +253,7 @@ public class UsuarioController {
 	@PostMapping("/usuario/nuevo_usuario")
 	public ResponseEntity<Usuario> altaUsuario(
 			@RequestBody Usuario newUsuario) {
+
 		
 		log.info("Se da de alta un nuevo usuario");		
 		Usuario user = new Usuario();
