@@ -4,15 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,14 +54,17 @@ public class RepostajeController {
 	 * Opcionalmente se indican las fechas entre las que están 
 	 * comprendidos los repostajes como parámetros en la cabecera.
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/{vehiculoId}/repostajes")
-	public ResponseEntity<?> RepostajesVehiculo(
+	public ResponseEntity<List<Repostaje>> RepostajesVehiculo(
 			@PathVariable Long vehiculoId,
 			@RequestParam(required = false) String fechaInicio,
 			@RequestParam(required = false) String fechaFin) 
 					 throws ParseException{
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
 		List<Repostaje> listaRepostajes = new ArrayList<Repostaje>();
 		
 		SimpleDateFormat fechaSDF = new SimpleDateFormat("yyyy-MM-dd");
@@ -84,16 +85,14 @@ public class RepostajeController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+			log.error("Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if(!listaRepostajes.isEmpty()) {
 			log.info("Lista populada");
-			resp.put("listaRepostajes", listaRepostajes);
 		} else {
 			log.info("La lista está vacia");
-			resp.put("mensaje", "Lista vacia");
 		}
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
@@ -104,10 +103,15 @@ public class RepostajeController {
 	/**
 	 * Añadir un repostaje a un vehículo
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_CONDUCTOR", 
+		"ROLE_ADMIN"})
 	@PostMapping(
 			path = "/{vehiculoId}/nuevo-repostaje", 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> addRepostaje(
+	public ResponseEntity<Repostaje> addRepostaje(
 			@PathVariable Long vehiculoId,
 			@RequestBody Repostaje repostajeNuevo) {
 		
@@ -117,7 +121,9 @@ public class RepostajeController {
 			iRepostajeService.addRepostaje(repostajeNuevo);
 			
 		} catch (DataAccessException dae) {
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			//resp.put("error","Error al añadir repostaje. Revise los datos e inténtelo más tarde");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -130,8 +136,12 @@ public class RepostajeController {
 	/**
 	 * Ver un repostaje concreto de un vehículo
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/{vehiculoId}/repostaje/{repostajeId}")
-	public ResponseEntity<?> RepostajeDetalle(
+	public ResponseEntity<Repostaje> RepostajeDetalle(
 			@PathVariable Long vehiculoId, 
 			@PathVariable Long repostajeId) {
 		
@@ -145,29 +155,29 @@ public class RepostajeController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			//resp.put("error", "Por favor inténtelo pasados unos minutos");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if(repostaje != null) {
 			log.info("El repostaje se puede mostrar");
-			//resp.put("repostaje", repostaje);
 		} else {
 			log.warn("El repostaje no se puede mostrar");
-			//resp.put("error", "Repostaje no encontrado");
 		}
 		
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
 		return new ResponseEntity<Repostaje>(repostaje, HttpStatus.OK);
-	}
-	
+	}	
 
 	
 	/**
 	 * Borrar un repostaje concreto por su ID
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@DeleteMapping("/{vehiculoId}/repostaje/{repostajeId}/borrar-repostaje")
-	public ResponseEntity<?> eliminaRepostaje(
+	public ResponseEntity<Repostaje> eliminaRepostaje(
 			@PathVariable Long repostajeId) {
 		
 		log.info("Eliminar el repostaje con id: " + repostajeId);
@@ -176,17 +186,13 @@ public class RepostajeController {
 		Vehiculo vehiculo = repostajeBorrar.getVehiculo();
 
 		log.info("El vehículo del repostaje  " + repostajeId + 
-				" es el de matrícula " + vehiculo.getVehiculoMatricula());		
-		
-		//Map<String, Object> resp = new HashMap<String, Object>();
+				" es el de matrícula " + vehiculo.getVehiculoMatricula());
 	
 		try {
 			log.info("Borrar el repostaje de la BBDD");
 			iRepostajeService.delRepostaje(repostajeId);
 			
-			log.info("Repostaje eliminado con éxito");
-			//resp.put("mensaje", "Repostaje eliminado satisfactoriamente");
-			
+			log.info("Repostaje eliminado con éxito");		
 			return new ResponseEntity<Repostaje>(repostajeBorrar, HttpStatus.OK);
 			
 		} catch(DataAccessException dae) {
@@ -198,18 +204,23 @@ public class RepostajeController {
 			} else {
 				log.error("Error al eliminar de la base de datos");
 			}
-			
-			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			//resp.put("mensaje", "Se ha producido un error al eliminar");
-			return new ResponseEntity<Repostaje>(rep, HttpStatus.INTERNAL_SERVER_ERROR);
+
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", message.concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
 	
 	/**
 	 * Modificar un repostaje concreto por su ID
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@PutMapping("/{vehiculoId}/repostaje/{repostajeId}/editar-repostaje")
-	public ResponseEntity<?> modificarRepostaje(
+	public ResponseEntity<Repostaje> modificarRepostaje(
 			@PathVariable Long repostajeId,
 			@RequestBody Repostaje repostajeJson) {
 		
@@ -225,15 +236,12 @@ public class RepostajeController {
 		
 		repostajeJson.setRepostajeId(repostajeId);
 		repostajeJson.setVehiculo(vehiculo);
-		
-		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Modificar el repostaje de la BBDD");
 			iRepostajeService.editRepostaje(repostajeJson);
 			
 			log.info("Repostaje modificado con éxito");
-			//resp.put("mensaje", "Repostaje modificado satisfactoriamente");
 			
 			return new ResponseEntity<Repostaje>(repostajeJson, HttpStatus.OK);
 			
@@ -247,12 +255,12 @@ public class RepostajeController {
 			} else {
 				log.error("Error al eliminar de la base de datos");
 			}
+
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", message.concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
 			
-			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			//resp.put("mensaje", "Se ha producido un error al eliminar");
-			
-			return new ResponseEntity<Repostaje>(rep, HttpStatus.INTERNAL_SERVER_ERROR);
-		}	
-	
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

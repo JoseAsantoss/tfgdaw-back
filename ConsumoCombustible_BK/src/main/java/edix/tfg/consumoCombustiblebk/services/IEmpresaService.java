@@ -9,8 +9,8 @@ public interface IEmpresaService {
 	List<Empresa> listarEmpresas();
 	Empresa altaEmpresa(Empresa empresa);
 	void deleteEmpresa(Long idEmpresa);
-	Empresa updateEmpresa(Empresa empresa);
 	Empresa buscarEmpresaId(Long idEmpresa);
 	Empresa buscarEmpresaCif(String cifEmpresa);
+	Empresa updateEmpresa(Long empresaId, Empresa empresa);
 	
 }

@@ -2,22 +2,16 @@ package edix.tfg.consumoCombustiblebk.restController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,13 +62,17 @@ public class MantenimientoController {
 	 * 
 	 * https://stackoverflow.com/a/60889337
 	 */
+	
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/{vehiculoId}/mantenimientos")
-	public ResponseEntity<?> MantenimientosVehiculo(
+	public ResponseEntity<List<Mantenimiento>> MantenimientosVehiculo(
 			@PathVariable Long vehiculoId,
 			@RequestParam Map<String, String> params) 
 					 throws ParseException{
 		
-		//Map<String, Object> resp = new HashMap<String, Object>();
 		List<Mantenimiento> listaMantenimientos = new ArrayList<Mantenimiento>();		
 		SimpleDateFormat fechaSDF = new SimpleDateFormat("yyyy-MM-dd");
 				
@@ -89,7 +87,6 @@ public class MantenimientoController {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
 				log.error(npe.initCause(npe));
-				//resp.put("error", "Por favor inténtelo pasados unos minutos");
 				return new ResponseEntity<>(
 						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
@@ -119,7 +116,6 @@ public class MantenimientoController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			//resp.put("error", "Por favor inténtelo pasados unos minutos");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -150,10 +146,8 @@ public class MantenimientoController {
 		
 		if(!listaMantenimientos.isEmpty()) {
 			log.info("Lista populada");
-			//resp.put("listaMantenimientos", listaMantenimientos);
 		} else {
 			log.info("La lista está vacia");
-			//resp.put("mensaje", "Lista vacia");
 		}
 		
 		log.info("Se devuelve la lista de Mantenimiento y el estado del HttpStatus");
@@ -164,15 +158,18 @@ public class MantenimientoController {
 	/**
 	 * Añadir un Mantenimiento a un vehículo
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_CONDUCTOR", 
+		"ROLE_ADMIN"})
 	@PostMapping(
 			path = "/{vehiculoId}/nuevo-mantenimiento", 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> addMantenimiento(
+	public ResponseEntity<Mantenimiento> addMantenimiento(
 			@PathVariable Long vehiculoId,
 			@RequestBody Mantenimiento mantenimientoJson) {
-		
-		//Map<String, Object> resp = new HashMap<String, Object>();
-		
+
 		try {
 			
 			Vehiculo vehiculoPath = iVehiculoService.detallesVehiculo(vehiculoId);
@@ -185,8 +182,9 @@ public class MantenimientoController {
 			}
 			
 		} catch (DataAccessException dae) {
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-			//resp.put("error","Error al añadir mantenimiento. Revise los datos e inténtelo más tarde");
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -198,12 +196,15 @@ public class MantenimientoController {
 	/**
 	 * Ver un mantenimiento concreto de un vehículo
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/{vehiculoId}/mantenimiento/{mantenimientoId}")
-	public ResponseEntity<?> MantenimientoDetalle(
+	public ResponseEntity<Mantenimiento> MantenimientoDetalle(
 			@PathVariable Long vehiculoId, 
 			@PathVariable Long mantenimientoId) {
 		
-		//Map<String, Object> resp = new HashMap<String, Object>();
 		Mantenimiento mantenimiento = new Mantenimiento();
 	
 		try {
@@ -213,29 +214,29 @@ public class MantenimientoController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			//resp.put("error", "Por favor inténtelo pasados unos minutos");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		if(mantenimiento != null) {
 			log.info("El Mantenimiento se puede mostrar");
-			//resp.put("Mantenimiento", mantenimiento);
 		} else {
 			log.warn("El mantenimiento no se puede mostrar");
-			//resp.put("error", "Mantenimiento no encontrado");
 		}
 		
 		log.info("Devolver Mantenimiento y estado del HttpStatus");
 		return new ResponseEntity<Mantenimiento>(mantenimiento, HttpStatus.OK);
-	}
-	
+	}	
 
 	
 	/**
 	 * Borrar un mantenimiento concreto por su ID
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@DeleteMapping("/{vehiculoId}/mantenimiento/{mantenimientoId}/borrar-mantenimiento")
-	public ResponseEntity<?> eliminaMantenimiento(
+	public ResponseEntity<Mantenimiento> eliminaMantenimiento(
 			@PathVariable Long mantenimientoId) {
 		
 		log.info("Eliminar el Mantenimiento con id: " + mantenimientoId);
@@ -245,16 +246,12 @@ public class MantenimientoController {
 
 		log.info("El vehículo del Mantenimiento  " + mantenimientoId + 
 				" es el de matrícula " + vehiculo.getVehiculoMatricula());
-		
-		
-		//Map<String, Object> resp = new HashMap<String, Object>();
-	
+			
 		try {
 			log.info("Borrar el Mantenimiento de la BBDD");
 			iMantenimientoService.delMantenimiento(mantenimientoId);
 			
 			log.info("Mantenimiento eliminado con éxito");
-			//resp.put("mensaje", "Mantenimiento eliminado satisfactoriamente");
 			
 			return new ResponseEntity<Mantenimiento>(mantenimientoBorrar, HttpStatus.OK);
 			
@@ -268,8 +265,10 @@ public class MantenimientoController {
 				log.error("Error al eliminar de la base de datos");
 			}
 			
-			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			//resp.put("mensaje", "Se ha producido un error al eliminar");
+			String message = dae.getMessage();
+			message = message != null? message : "";			
+			
+			log.error("error", message.concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
 	}
@@ -278,16 +277,19 @@ public class MantenimientoController {
 	 * Modificar un Mantenimiento concreto por su ID
 	 * @throws ParseException 
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@PutMapping("/{vehiculoId}/mantenimiento/{mantenimientoId}/editar-mantenimiento")
-	public ResponseEntity<?> modificarMantenimiento(
+	public ResponseEntity<Mantenimiento> modificarMantenimiento(
 			@PathVariable Long mantenimientoId,
 			@RequestBody Mantenimiento mantenimientoJson) throws ParseException {
 		
 		log.info("Modificar el Mantenimiento con id: " + mantenimientoId);
 		
 		Mantenimiento mantenimientoEditar = iMantenimientoService.showMantenimiento(mantenimientoId);
-		Vehiculo vehiculo = mantenimientoEditar.getVehiculo();
-		
+		Vehiculo vehiculo = mantenimientoEditar.getVehiculo();		
 
 		System.out.println(mantenimientoEditar.getMantenimientoFecha());
 		System.out.println(mantenimientoJson.getMantenimientoFecha());
@@ -325,15 +327,11 @@ public class MantenimientoController {
 				mantenimientoEditar.setMantenimientoObservaciones(mantenimientoJson.getMantenimientoObservaciones());
 			}
 		}
-		
-		//Map<String, Object> resp = new HashMap<String, Object>();
 	
 		try {
 			log.info("Modificar el Mantenimiento de la BBDD");
 			iMantenimientoService.editMantenimiento(mantenimientoEditar);
-			log.info("Mantenimiento modificado con éxito");
-			//resp.put("mensaje", "Mantenimiento modificado satisfactoriamente");
-						
+			log.info("Mantenimiento modificado con éxito");					
 			return new ResponseEntity<Mantenimiento>(mantenimientoEditar, HttpStatus.CREATED);
 			
 		} catch(DataAccessException dae) {		
@@ -346,12 +344,11 @@ public class MantenimientoController {
 			} else {
 				log.error("Error al eliminar de la base de datos");
 			}
-			
-			log.error("error", dae.getMessage().concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
-			//resp.put("mensaje", "Se ha producido un error al eliminar");
-			
+
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", message.concat(":" ).concat(dae.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	
+		}	
 	}
 }

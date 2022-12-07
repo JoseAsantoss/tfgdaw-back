@@ -2,7 +2,6 @@ package edix.tfg.consumoCombustiblebk.restController;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,13 +46,16 @@ public class VehiculoController {
 	
 	@Autowired
 	IRepostajeService iRepostajeService;
-	
+
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@PostMapping("/usuario/{usuarioId}/nuevo-vehiculo")
-	public ResponseEntity<?> altaVehiculoDeUsuario(
+	public ResponseEntity<Vehiculo> altaVehiculoDeUsuario(
 			@PathVariable Long usuarioId, 
 			@RequestBody Vehiculo vehiculo) {
 		
-		Map<String, Object> resp = new HashMap<String, Object>();
 		log.info("Se recogen los datos del usuario");
 		Usuario usuario = iUsuarioService.showUsuarioById(usuarioId);
 
@@ -66,13 +69,9 @@ public class VehiculoController {
 			vehiculo.setVersionCoche(version);
 		}
 		
-		
-		
 		try {
 			log.info("Se da de alta el vehiculo en la base de datos");
 			iVehiculoService.altaVehiculoUsuario(vehiculo);
-			resp.put("mensaje", "Alta satisfactoria");
-			resp.put("vehiculo", vehiculo);
 			log.info("Alta del vehiculo correcta");
 			
 			//asignar al usuario
@@ -81,10 +80,11 @@ public class VehiculoController {
 				usuario.getVehiculos().add(vehiculo);
 				iUsuarioService.updateUsuario(usuario);
 			}
-		}catch (DataAccessException dae) {
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-			resp.put("error","Se ha producido un erro en el alta. Revise los datos e inténtelo más tarde");
-			return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (DataAccessException dae) {
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se envia response y estatus");
 		return new ResponseEntity<Vehiculo>(vehiculo, HttpStatus.CREATED);
@@ -98,13 +98,17 @@ public class VehiculoController {
 	 * Búsqueda por marca, modelo o versión si envía parámetro descripcion.
 	 * 
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_CONDUCTOR", 
+		"ROLE_ADMIN"})
 	@GetMapping("/usuario/{usuarioId}/vehiculos")
-	public ResponseEntity<?> busquedaVehiculosUsuario(
+	public ResponseEntity<List<Vehiculo>> busquedaVehiculosUsuario(
 			@PathVariable Long usuarioId, 
 			@RequestParam Map<String, String> params) 
 					 throws ParseException {
 
-		Map<String, Object> resp = new HashMap<String, Object>();
 		List<Vehiculo> listaVehiculos = new ArrayList<Vehiculo>();
 		
 		if (params.size() == 0) {
@@ -114,8 +118,7 @@ public class VehiculoController {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
 				log.error(npe.initCause(npe));
-				resp.put("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -133,8 +136,7 @@ public class VehiculoController {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
 				log.error(npe.initCause(npe));
-				resp.put("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
@@ -146,17 +148,14 @@ public class VehiculoController {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
 				log.error(npe.initCause(npe));
-				resp.put("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
 		if (!listaVehiculos.isEmpty()) {
 			log.info("Lista populada");
-			resp.put("lista", listaVehiculos);
 		} else {
 			log.info("La lista está vacia");
-			resp.put("mensaje", "Lista vacia");
 		}
 
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
@@ -164,22 +163,27 @@ public class VehiculoController {
 	}
 	
 
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_CONDUCTOR", 
+		"ROLE_ADMIN"})
 	@GetMapping("/usuario/{usuarioId}/totalVehiculos")
-	public ResponseEntity<?> contarVehiculosUsuario(
+	public ResponseEntity<Integer> contarVehiculosUsuario(
 			@PathVariable Long usuarioId) 
 					 throws ParseException {
 
 		Integer totalVehiculos;
 		
-			try {
-				totalVehiculos = iVehiculoService.contarVehiculosUsuario(usuarioId);
-			} catch (NullPointerException npe) {
-				log.error(npe.getStackTrace());
-				log.error(npe.getCause());
-				log.error(npe.initCause(npe));
-				log.error("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+		try {
+			totalVehiculos = iVehiculoService.contarVehiculosUsuario(usuarioId);
+		} catch (NullPointerException npe) {
+			log.error(npe.getStackTrace());
+			log.error(npe.getCause());
+			log.error(npe.initCause(npe));
+			log.error("error", "Por favor inténtelo pasados unos minutos");
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
 		log.info("Se devuelve el objeto response " + totalVehiculos.toString() + " más el estado del HttpStatus");
 		return new ResponseEntity<Integer>(totalVehiculos, HttpStatus.OK);
@@ -189,11 +193,14 @@ public class VehiculoController {
 	/**
 	 * Detalles de un vehículo
 	 */
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/vehiculo/{vehiculoId}")
-	public ResponseEntity<?> vehiculoDetalle(
+	public ResponseEntity<Vehiculo> vehiculoDetalle(
 			@PathVariable Long vehiculoId) {
 
-		Map<String, Object> resp = new HashMap<String, Object>();
 		Vehiculo vehiculo = new Vehiculo();
 		
 		try {
@@ -202,20 +209,16 @@ public class VehiculoController {
 			log.error(npe.getStackTrace());
 			log.error(npe.getCause());
 			log.error(npe.initCause(npe));
-			resp.put("error", "Por favor inténtelo pasados unos minutos");
-			return new ResponseEntity<Vehiculo>(vehiculo, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		if(vehiculo != null) {
+		if (vehiculo != null) {
 			log.info("El vehículo se puede mostrar");
-			resp.put("vehiculo", vehiculo);
-		}else {
+		} else {
 			log.warn("El vehículo no se puede mostrar");
-			resp.put("error", "Vehículo no encontrado");
 		}
 
 		log.info("Se devuelve el objeto response más el estado del HttpStatus");
-		//return new ResponseEntity<Map<String, Object>>(resp, HttpStatus.OK);
 		return new ResponseEntity<Vehiculo>(vehiculo, HttpStatus.OK);
 	}	
 }

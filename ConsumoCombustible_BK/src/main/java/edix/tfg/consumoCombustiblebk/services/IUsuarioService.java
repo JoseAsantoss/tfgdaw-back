@@ -2,8 +2,6 @@ package edix.tfg.consumoCombustiblebk.services;
 
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import edix.tfg.consumoCombustiblebk.models.entity.Rol;
 import edix.tfg.consumoCombustiblebk.models.entity.Usuario;
 import edix.tfg.consumoCombustiblebk.models.entity.Vehiculo;

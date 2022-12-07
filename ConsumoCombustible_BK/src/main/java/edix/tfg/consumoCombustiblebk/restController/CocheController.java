@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,8 +39,12 @@ public class CocheController {
 	@Autowired
 	IMarcaCocheService iMarcaCocheService;
 	
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/marcas")
-	public ResponseEntity<?> listarMarcas(){
+	public ResponseEntity<List<MarcaCoche>> listarMarcas(){
 		
 		List<MarcaCoche> listaMarcas = new ArrayList<>();
 		
@@ -55,16 +60,21 @@ public class CocheController {
 		return new ResponseEntity<List<MarcaCoche>>(listaMarcas, HttpStatus.OK);
 	}
 	
+	@Secured({ 
+		"ROLE_ADMIN"})
 	@PostMapping(
 			path = "/marcas/nueva-marca", 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> nuevaMarca(
+	public ResponseEntity<MarcaCoche> nuevaMarca(
 			@RequestBody MarcaCoche marcaCocheJson
 			){
+		
 		try {
 			iMarcaCocheService.addMarcaCoche(marcaCocheJson);
 		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se devuelve el objeto response de "
@@ -76,16 +86,21 @@ public class CocheController {
 		return new ResponseEntity<MarcaCoche>(marcaCocheJson, HttpStatus.OK);
 	}
 	
+	@Secured({ 
+		"ROLE_ADMIN"})
 	@DeleteMapping("/marca/{marcaId}")
-	public ResponseEntity<?> borrarMarca(
+	public ResponseEntity<MarcaCoche> borrarMarca(
 			@PathVariable Long marcaId
 			){
+		
 		MarcaCoche marcaBorrar = null;
 		try {
 			marcaBorrar = iMarcaCocheService.showByMarcaId(marcaId);
 			iMarcaCocheService.deleteMarcaId(marcaId);
 		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se devuelve el objeto response de "
@@ -101,10 +116,12 @@ public class CocheController {
 		}
 	}
 	
+	@Secured({
+		"ROLE_ADMIN"})
 	@DeleteMapping(
 			path = "/marcas", 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> borrarMarca(
+	public ResponseEntity<MarcaCoche> borrarMarca(
 			@RequestBody MarcaCoche marcaCocheJson
 			){
 		String nombreMarca = marcaCocheJson.getMarcaNombre();
@@ -120,7 +137,9 @@ public class CocheController {
 			iMarcaCocheService.deleteMarcaId(marcaAlmacenada.getMarcaId());
 			
 		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		log.info("Se devuelve el objeto response de "
@@ -132,8 +151,12 @@ public class CocheController {
 		return new ResponseEntity<MarcaCoche>(marcaAlmacenada, HttpStatus.OK);
 	}
 	
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/marca/{marcaId}/modelos")
-	public ResponseEntity<?> listarModelos(
+	public ResponseEntity<List<ModeloCoche>> listarModelos(
 			@PathVariable Long marcaId){
 		
 		List<ModeloCoche> listaModelos = new ArrayList<>();
@@ -150,12 +173,14 @@ public class CocheController {
 		return new ResponseEntity<List<ModeloCoche>>(listaModelos, HttpStatus.OK);
 	}
 	
+	@Secured({
+		"ROLE_ADMIN"})
 	@SuppressWarnings("null")
 	@PostMapping(
 			path = {"/marca/{marcaIdJson}/nuevo-modelo",
 					"/marcas/nuevo-modelo"}, 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> nuevoModelo(
+	public ResponseEntity<ModeloCoche> nuevoModelo(
 			@RequestBody ModeloCoche modeloCocheJson,
 			@PathVariable(required = false) Long marcaIdJson
 			){
@@ -214,8 +239,12 @@ public class CocheController {
 		return new ResponseEntity<ModeloCoche>(modeloCocheJson, HttpStatus.OK);
 	}
 	
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/marca/{marcaId}/modelo/{modeloId}/versiones")
-	public ResponseEntity<?> listarVersiones(
+	public ResponseEntity<List<VersionCoche>> listarVersiones(
 			@PathVariable Long marcaId,
 			@PathVariable Long modeloId){
 		
@@ -233,8 +262,12 @@ public class CocheController {
 		return new ResponseEntity<List<VersionCoche>>(listaVersiones, HttpStatus.OK);
 	}
 	
+	@Secured({
+		"ROLE_PARTICULAR", 
+		"ROLE_EMPRESA", 
+		"ROLE_ADMIN"})
 	@GetMapping("/marca/{marcaId}/modelo/{modeloId}/version/{versionId}")
-	public ResponseEntity<?> buscarVersion(
+	public ResponseEntity<VersionCoche> buscarVersion(
 			@PathVariable Long marcaId,
 			@PathVariable Long modeloId,
 			@PathVariable Long versionId){
@@ -254,17 +287,21 @@ public class CocheController {
 	}
 	
 
-	
+	@Secured({
+		"ROLE_ADMIN"})
 	@DeleteMapping("/marca/{marcaId}/modelo/{modeloId}")
 	public ResponseEntity<?> borrarModelo(
 			@PathVariable Long marcaId,
 			@PathVariable Long modeloId
 			){
+		
 		ModeloCoche modeloBorrar = null;
 		try {
 			modeloBorrar = iModeloCocheService.borrarByModeloId(modeloId);
 		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -276,12 +313,13 @@ public class CocheController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		System.out.println(modeloBorrar.toString());
-		//return new ResponseEntity<ModeloCoche>(modeloBorrar, HttpStatus.OK);
+		//System.out.println(modeloBorrar.toString());
 		return new ResponseEntity<>(HttpStatus.OK);
 		
 	}
 	
+	@Secured({
+		"ROLE_ADMIN"})
 	@DeleteMapping(
 			path = {"/marcas/borrar-modelo"}, 
 	        consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -296,7 +334,9 @@ public class CocheController {
 		String nombreMarca = marcaCocheJson.getMarcaNombre();
 		Long marcaId = marcaCocheJson.getMarcaId();
 		
+		@SuppressWarnings("unused")
 		MarcaCoche marcaAlmacenada = null;
+		
 		try {
 			if (marcaId == null) {
 				marcaAlmacenada = iMarcaCocheService.findMarcaByNombre(nombreMarca);
@@ -304,7 +344,9 @@ public class CocheController {
 				marcaAlmacenada = iMarcaCocheService.showByMarcaId(marcaId);
 			}
 		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -315,20 +357,21 @@ public class CocheController {
 		} catch (Exception e) {
 			log.error("error", "error: ".concat(e.getMessage().concat(" - ").concat(e.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
+		}		
 		
 		System.out.println(modeloIdJson);
 		
 		// Ver si entre los datos hay una ModeloCoche que tenga el mismo nombre.
 		// Si no la hay, sacarla desde el ID
-		ModeloCoche modeloEnviado = iModeloCocheService.showByModeloId(modeloIdJson);		
+		//ModeloCoche modeloEnviado = iModeloCocheService.showByModeloId(modeloIdJson);		
 		
 		try {
 			iModeloCocheService.borrarByModeloId(modeloIdJson);
 			
-		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+		} catch (DataAccessException dae) {
+			String message = dae.getMessage();
+			message = message != null? message : "";
+			log.error("error", "error: ".concat(message.concat(" - ").concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -342,13 +385,15 @@ public class CocheController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@Secured({
+		"ROLE_ADMIN"})
 	@SuppressWarnings("null")
 	@PostMapping(
 			path = {"/marca/{marcaIdJson}/modelo/{modeloIdJson}/nueva-version",
 					"/marcas/nueva-version"}, 
 	        consumes = MediaType.APPLICATION_JSON_VALUE, 
 	        produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> nuevaVersion(
+	public ResponseEntity<VersionCoche> nuevaVersion(
 			@RequestBody VersionCoche versionCocheJson,
 			@PathVariable(required = false) Long modeloIdJson
 			){
@@ -375,9 +420,6 @@ public class CocheController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return new ResponseEntity<VersionCoche>(version, HttpStatus.CREATED);
-		
-		
 	}
-	
 	
 }

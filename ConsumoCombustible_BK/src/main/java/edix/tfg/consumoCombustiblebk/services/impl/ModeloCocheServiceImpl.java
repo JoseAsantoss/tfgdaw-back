@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edix.tfg.consumoCombustiblebk.dao.IModeloCocheDao;
-import edix.tfg.consumoCombustiblebk.models.entity.MarcaCoche;
 import edix.tfg.consumoCombustiblebk.models.entity.ModeloCoche;
 import edix.tfg.consumoCombustiblebk.services.IMarcaCocheService;
 import edix.tfg.consumoCombustiblebk.services.IModeloCocheService;
@@ -51,14 +50,8 @@ public class ModeloCocheServiceImpl implements IModeloCocheService {
 		return modeloBorrar;
 	}
 
-	/*@Override
-	public List<ModeloCoche> listAllModelosFromMarca(MarcaCoche marca) {
-		return iModeloCocheDao.findByMarcaId(marca.getMarcaId());
-	}*/
-
 	@Override
 	public List<ModeloCoche> listAllModelosFromMarca(Long marcaCocheId) {
-		MarcaCoche marcaDelModelo = iMarcaCocheService.showByMarcaId(marcaCocheId);
 		return iModeloCocheDao.findByMarcaId(marcaCocheId);
 	}
 

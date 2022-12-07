@@ -3,7 +3,6 @@ package edix.tfg.consumoCombustiblebk.services.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import edix.tfg.consumoCombustiblebk.dao.IEmpresaDao;
@@ -49,14 +48,14 @@ public class EmpresaServiceImpl implements IEmpresaService {
 
 	@Override
 	public void deleteEmpresa(Long idEmpresa) {
-		// TODO Auto-generated method stub
+		iEmpresaDao.deleteById(idEmpresa);
 
 	}
 
 	@Override
-	public Empresa updateEmpresa(Empresa empresa) {
-		// TODO Auto-generated method stub
-		return null;
+	public Empresa updateEmpresa(Long empresaId, Empresa empresa) {
+		empresa.setEmpresaId(empresaId);
+		return iEmpresaDao.save(empresa);
 	}
 
 }
