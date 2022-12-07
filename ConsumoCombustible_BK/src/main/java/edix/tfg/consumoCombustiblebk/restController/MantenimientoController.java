@@ -83,18 +83,22 @@ public class MantenimientoController {
 		
 		if (params.size() == 0) { //sin parámetros
 			try {
-				listaMantenimientos = iMantenimientoService.showByVehiculoId(vehiculoId);
+				listaMantenimientos = 
+						iMantenimientoService.showByVehiculoId(vehiculoId);
 			} catch (NullPointerException npe) {
 				log.error(npe.getStackTrace());
 				log.error(npe.getCause());
 				log.error(npe.initCause(npe));
 				//resp.put("error", "Por favor inténtelo pasados unos minutos");
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(
+						HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
-		if (params.size() > 3) { //Aceptar solo dos parámetros (dos fechas y cadena de búsqueda)
-		      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sólo se pueden incluir tres parámetros");
+		if (params.size() > 3) { //Aceptar máx 3 parámetros (2 fechas y búsqueda)
+		      throw new ResponseStatusException(
+		    		  HttpStatus.BAD_REQUEST, 
+		    		  "Sólo se pueden incluir tres parámetros");
 		}
 		
 		String fechaInicio = "1900-01-01";
@@ -121,12 +125,26 @@ public class MantenimientoController {
 		
 		if (params.containsKey("buscar")) {
 			String busqueda = params.get("buscar");
-			listaMantenimientos = iMantenimientoService.searchByVehiculoIdFechas(vehiculoId, busqueda, fechaInicioDate, fechaFinDate);
+			listaMantenimientos = 
+					iMantenimientoService.searchByVehiculoIdFechas(
+					vehiculoId, 
+					busqueda, 
+					fechaInicioDate, 
+					fechaFinDate);
 		} else if  (params.containsKey("buscar-profundo")) {
 			String busqueda = params.get("buscar-profundo");
-			listaMantenimientos = iMantenimientoService.searchConceptObsByVehiculoIdFechas(vehiculoId, busqueda, fechaInicioDate, fechaFinDate);
+			listaMantenimientos = 
+					iMantenimientoService.searchConceptObsByVehiculoIdFechas(
+							vehiculoId, 
+							busqueda, 
+							fechaInicioDate, 
+							fechaFinDate);
 		} else {
-			listaMantenimientos = iMantenimientoService.showByVehiculoIdAndDate(vehiculoId, fechaInicioDate, fechaFinDate);
+			listaMantenimientos = 
+					iMantenimientoService.showByVehiculoIdAndDate(
+							vehiculoId, 
+							fechaInicioDate, 
+							fechaFinDate);
 		}
 		
 		

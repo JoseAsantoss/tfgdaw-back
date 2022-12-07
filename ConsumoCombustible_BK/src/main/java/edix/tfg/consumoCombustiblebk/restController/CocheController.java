@@ -150,6 +150,7 @@ public class CocheController {
 		return new ResponseEntity<List<ModeloCoche>>(listaModelos, HttpStatus.OK);
 	}
 	
+	@SuppressWarnings("null")
 	@PostMapping(
 			path = {"/marca/{marcaIdJson}/nuevo-modelo",
 					"/marcas/nuevo-modelo"}, 
@@ -168,37 +169,39 @@ public class CocheController {
 		/*if (marcaIdJson != null) {
 			marcaId = (marcaJson.getMarcaId() == null )? marcaId : marcaJson.getMarcaId();
 		} */
-		
-		// Ver si entre los datos hay una MarcaCoche que tenga el mismo nombre.
-		// Si no la hay, sacarla desde el ID
-		MarcaCoche marcaDelModeloEnviada = iMarcaCocheService.findMarcaByNombre(nombreMarca);		
-		if (marcaDelModeloEnviada == null) {
-			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaId);
-		}
-		marcaId = marcaDelModeloEnviada.getMarcaId();
-		
-		// Si marca por path y JSON no coinciden, y ninguna es null, error
-		/*if (marcaIdJson != marcaIdJson && marcaIdJson != null) {
-			log.error("La marca de la ruta y la incluida en el modelo no coinciden");
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}*/
-		
-		Long marcaIdDefinitiva = Optional.ofNullable(marcaId).orElse(marcaId);
-		
-		// Si marca por path y JSON son ambas null, error
-		if (marcaIdDefinitiva == null) {
-			log.error("La marca de la ruta y la incluida en el modelo no coinciden");
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaIdDefinitiva);
-		modeloCocheJson.setMarcaCoche(marcaDelModeloEnviada);		
-
 		try {
+			// Ver si entre los datos hay una MarcaCoche que tenga el mismo nombre.
+			// Si no la hay, sacarla desde el ID
+			MarcaCoche marcaDelModeloEnviada = iMarcaCocheService.findMarcaByNombre(nombreMarca);		
+			if (marcaDelModeloEnviada == null) {
+				marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaId);
+			}
+			//marcaId = marcaDelModeloEnviada.getMarcaId();
+			
+			// Si marca por path y JSON no coinciden, y ninguna es null, error
+			/*if (marcaIdJson != marcaIdJson && marcaIdJson != null) {
+				log.error("La marca de la ruta y la incluida en el modelo no coinciden");
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}*/
+			
+			Long marcaIdDefinitiva = Optional
+					.ofNullable(marcaDelModeloEnviada.getMarcaId())
+					.orElse(null);			
+			// Si marca por path y JSON son ambas null, error
+			if (marcaIdDefinitiva == null) {
+				log.error("La marca de la ruta y la incluida en el modelo no coinciden");
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}			
+			marcaDelModeloEnviada = iMarcaCocheService.showByMarcaId(marcaIdDefinitiva);
+			modeloCocheJson.setMarcaCoche(marcaDelModeloEnviada);
 			iModeloCocheService.addModeloCoche(modeloCocheJson);
 			
 		} catch (DataAccessException dae){
-			log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
+			log.error("error", 
+					"error: "
+					.concat(dae.getMessage()
+					.concat(" - ")
+					.concat(dae.getLocalizedMessage())));
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -339,6 +342,7 @@ public class CocheController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	@SuppressWarnings("null")
 	@PostMapping(
 			path = {"/marca/{marcaIdJson}/modelo/{modeloIdJson}/nueva-version",
 					"/marcas/nueva-version"}, 
@@ -352,22 +356,25 @@ public class CocheController {
 		ModeloCoche modelo = versionCocheJson.getModeloCoche();
 		Long modeloId = (modeloIdJson != null)? modeloIdJson : modelo.getModeloId();
 		VersionCoche version = null;
-		Long versionId = null;
-		
+		Long versionId = null;		
 					
-			try {			
-				modelo = iModeloCocheService.showByModeloId(modeloId);
-				versionCocheJson.setModeloCoche(modelo);
-				version = iVersionCocheService.addVersion(versionCocheJson);
-				versionId = version.getVersionId();
-				version = iVersionCocheService.showByVersionId(versionId);
-				System.out.println(version);
-			} catch (DataAccessException dae){
-				System.out.println("Entra en el catch");
-				log.error("error", "error: ".concat(dae.getMessage().concat(" - ").concat(dae.getLocalizedMessage())));
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-			return new ResponseEntity<VersionCoche>(version, HttpStatus.CREATED);
+		try {
+			modelo = iModeloCocheService.showByModeloId(modeloId);
+			versionCocheJson.setModeloCoche(modelo);
+			version = iVersionCocheService.addVersion(versionCocheJson);
+			versionId = version.getVersionId();
+			version = iVersionCocheService.showByVersionId(versionId);
+			System.out.println(version);
+		} catch (DataAccessException dae){
+			System.out.println("Entra en el catch");
+			log.error("error", 
+					"error: "
+					.concat(dae.getMessage()
+					.concat(" - ")
+					.concat(dae.getLocalizedMessage())));
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<VersionCoche>(version, HttpStatus.CREATED);
 		
 		
 	}
