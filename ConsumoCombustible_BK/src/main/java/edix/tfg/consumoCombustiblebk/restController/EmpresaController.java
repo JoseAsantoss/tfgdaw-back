@@ -62,7 +62,6 @@ public class EmpresaController {
 	 * @return Empresa Es la empresa correspondiente al ID indicado.
 	 */
 	@Secured({
-		"ROLE_PARTICULAR", 
 		"ROLE_EMPRESA", 
 		"ROLE_CONDUCTOR", 
 		"ROLE_ADMIN"})
@@ -85,7 +84,6 @@ public class EmpresaController {
 	}
 	
 	@Secured({
-		"ROLE_PARTICULAR", 
 		"ROLE_EMPRESA", 
 		"ROLE_CONDUCTOR", 
 		"ROLE_ADMIN"})

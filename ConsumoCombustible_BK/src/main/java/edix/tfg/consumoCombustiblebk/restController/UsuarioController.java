@@ -350,6 +350,23 @@ public class UsuarioController {
 				usuActual.setPassword(newUsuario.getPassword());
 			}
 			
+
+			Empresa empresaUsuario = newUsuario.getEmpresa();
+			Empresa empresaBaseDatos = null;
+			
+			if (empresaUsuario != null) {
+				
+				log.info("Se actualiza la empresa");				
+				if (empresaUsuario.getCif() != null) {
+					empresaBaseDatos = iEmpresaService.buscarEmpresaCif(empresaUsuario.getCif());
+				}
+				if (empresaUsuario.getEmpresaId() != null) {
+					empresaBaseDatos = iEmpresaService.buscarEmpresaId(empresaUsuario.getEmpresaId());
+				}				
+				
+				usuActual.setEmpresa(empresaBaseDatos);
+			}
+			
 			if (newUsuario.getRoles() != null) {
 				log.info("Se actualizan los roles");
 				List<Rol> rolesUsuario = new ArrayList<Rol>();
