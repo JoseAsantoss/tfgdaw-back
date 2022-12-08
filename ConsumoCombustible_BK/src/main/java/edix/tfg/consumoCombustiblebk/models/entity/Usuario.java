@@ -53,7 +53,7 @@ public class Usuario implements Serializable{
 	
 	private String password;
 	
-	private String username;	
+	//private String username;	
 
 	private Boolean enabled;
 	

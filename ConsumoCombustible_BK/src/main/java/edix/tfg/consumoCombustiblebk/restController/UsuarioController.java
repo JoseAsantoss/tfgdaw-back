@@ -12,6 +12,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -250,7 +252,7 @@ public class UsuarioController {
 		"ROLE_PARTICULAR", 
 		"ROLE_EMPRESA", 
 		"ROLE_ADMIN"})
-	@PostMapping("/usuario/nuevo_usuario")
+	@PostMapping("/usuario/nuevo-usuario")
 	public ResponseEntity<Usuario> altaUsuario(
 			@RequestBody Usuario newUsuario) {
 
@@ -287,7 +289,8 @@ public class UsuarioController {
 			
 			log.info("Se manda a base de datos el nuevo usuario");
 			newUsuario.setEnabled(true);
-			newUsuario.setUsername(newUsuario.getUsuarioEmail());
+			//newUsuario.setUsername(newUsuario.getUsuarioEmail());
+			newUsuario.setPassword(new BCryptPasswordEncoder().encode(newUsuario.getPassword()));
 			user = iUsuarioService.createUsuario(newUsuario);
 			log.info("Usuario creado con éxito");
 		} catch (DataAccessException dae) {
