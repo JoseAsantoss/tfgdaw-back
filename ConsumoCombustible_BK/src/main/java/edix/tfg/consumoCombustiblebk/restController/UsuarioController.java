@@ -12,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +49,9 @@ public class UsuarioController {
 	
 	@Autowired
 	IEmpresaService iEmpresaService;
+	
+	@Autowired
+	private PasswordEncoder pwenco;
 	
 	/**
 	 * End point para listar todos los usuarios de la aplicacion
@@ -246,14 +250,9 @@ public class UsuarioController {
 	 * @param newUsuario de tipo Usuario
 	 * @return 
 	 */
-	@Secured({
-		"ROLE_PARTICULAR", 
-		"ROLE_EMPRESA", 
-		"ROLE_ADMIN"})
 	@PostMapping("/usuario/nuevo_usuario")
 	public ResponseEntity<Usuario> altaUsuario(
 			@RequestBody Usuario newUsuario) {
-
 		
 		log.info("Se da de alta un nuevo usuario");		
 		Usuario user = new Usuario();
@@ -288,6 +287,7 @@ public class UsuarioController {
 			log.info("Se manda a base de datos el nuevo usuario");
 			newUsuario.setEnabled(true);
 			newUsuario.setUsername(newUsuario.getUsuarioEmail());
+			newUsuario.setPassword(pwenco.encode(newUsuario.getPassword()));
 			user = iUsuarioService.createUsuario(newUsuario);
 			log.info("Usuario creado con éxito");
 		} catch (DataAccessException dae) {
